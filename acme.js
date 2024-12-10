@@ -400,6 +400,29 @@ export async function fetchRequest(method, url, signedData) {
 }
 
 /**
+ * Fetches the suggested renewal window information for a certificate from the specified URL.
+ * @async
+ * @function fetchSuggestedWindow
+ * @param {string} renewalInfoUrl - The base URL for fetching renewal information.
+ * @param {string} aki- The Authority Key Identifier in hexadecimal format.
+ * @param {string} serial - The serial number in hexadecimal format.
+ * @returns {Promise<Object|undefined>} A promise that resolves to the parsed JSON
+ * response if the request is successful, or `undefined` if the request fails.
+ *
+ * @throws {Error} Throws an error if the fetch operation fails.
+ */
+export async function fetchSuggestedWindow(renewalInfoUrl, aki, serial) {
+    const url = `${renewalInfoUrl}/${base64urlEncode(hexToBytes(aki))}.${base64urlEncode(hexToBytes(serial))}`;
+
+    const response = await fetch(url);
+    if (response.ok) {
+        return await response.json()
+    }
+
+    return undefined;
+}
+
+/**
  * Formats a PEM-encoded public key to a key object.
  * @function formatPublicKey
  * @param {string} pem - The PEM-encoded public key
@@ -432,4 +455,19 @@ export function base64urlEncode(input) {
         .replace(/\+/g, '-')   // Replace + with -
         .replace(/\//g, '_')   // Replace / with _
         .replace(/=+$/, '');   // Remove trailing =
+}
+
+/**
+ * Converts a hexadecimal string to a Uint8Array of bytes.
+ * @function hexToBytes
+ * @param {string} hex - The hexadecimal string to convert. It should contain an even number of characters.
+ * @returns {Uint8Array} A Uint8Array containing the byte values represented by the hexadecimal string.
+ * @throws {Error} Throws an error if the input string has an odd length or contains invalid hexadecimal characters.
+ */
+export function hexToBytes(hex) {
+    const bytes = new Uint8Array(hex.length / 2);
+    for (let i = 0; i < hex.length; i += 2) {
+        bytes[i / 2] = parseInt(hex.substr(i, 2), 16);
+    }
+    return bytes;
 }

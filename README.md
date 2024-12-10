@@ -214,6 +214,24 @@ export async function signPayload(payload, protectedHeader, privateKey) { /*...*
 export async function fetchRequest(method, url, signedData) { /*...*/ }
 ```
 
+### fetchSuggestedWindow
+
+```javascript
+/**
+ * Fetches the suggested renewal window information from the specified URL.
+ * @async
+ * @function fetchSuggestedWindow
+ * @param {string} renewalInfoUrl - The base URL for fetching renewal information.
+ * @param {string} aki- The Authority Key Identifier in hexadecimal format.
+ * @param {string} serial - The serial number in hexadecimal format.
+ * @returns {Promise<Object|undefined>} A promise that resolves to the parsed JSON
+ * response if the request is successful, or `undefined` if the request fails.
+ *
+ * @throws {Error} Throws an error if the fetch operation fails.
+ */
+export async function fetchSuggestedWindow(renewalInfoUrl, aki, serial) { /*...*/ }
+```
+
 ### formatPublicKey
 
 ```javascript
@@ -250,6 +268,19 @@ export function formatPrivateKey(pem) { /*...*/ }
  * @returns {string} A base64url-encoded string
  */
 export function base64urlEncode(input) { /*...*/ }
+```
+
+### hexToBytes
+
+```javascript
+/**
+ * Converts a hexadecimal string to a Uint8Array of bytes.
+ * @function hexToBytes
+ * @param {string} hex - The hexadecimal string to convert. It should contain an even number of characters.
+ * @returns {Uint8Array} A Uint8Array containing the byte values represented by the hexadecimal string.
+ * @throws {Error} Throws an error if the input string has an odd length or contains invalid hexadecimal characters.
+ */
+export function hexToBytes(hex) { /*...*/ }
 ```
 
 ------
