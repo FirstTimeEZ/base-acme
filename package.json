@@ -1,0 +1,37 @@
+{
+  "name": "base-acme-client",
+  "author": "FirstTimeEZ",
+  "version": "1.0.2",
+  "description": "Implementation of the Automatic Certificate Management Environment in Javascript (RFC8555)",
+  "main": "acme.js",
+  "type": "module",
+  "keywords": [
+    "RFC8555",
+    "automatic",
+    "certificate",
+    "management",
+    "environment",
+    "post-as-get",
+    "replay-nonce",
+    "acme",
+    "acme-v2",
+    "ssl",
+    "tls",
+    "security",
+    "web",
+    "https",
+    "client",
+    "challenge",
+    "http-01",
+    "dns"
+  ],
+  "license": "Apache-2.0",
+  "dependencies": {
+    "simple-csr-generator": "^1.0.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FirstTimeEZ/base-acme.git"
+  },
+  "homepage": "https://github.com/FirstTimeEZ/server-ssl"
+}
