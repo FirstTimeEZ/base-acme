@@ -70,6 +70,7 @@ export async function createJsonWebKey(publicKey) { /*...*/ }
  * @property {Object} [answer.account] - The created account details
  * @property {string} [answer.location] - The location URL of the created account
  * @property {Object} [answer.error] - Error details if account creation fails
+ * @property {Error} [answer.exception] - An error object if an exception occurs
  * @property {string} [nonce] - A new replay nonce for subsequent requests
  */
 export async function createAccount(nonce, newAccountUrl, privateKey, jsonWebKey) { /*...*/ }
@@ -92,6 +93,7 @@ export async function createAccount(nonce, newAccountUrl, privateKey, jsonWebKey
  * @property {Object} [answer.order] - The created order details
  * @property {string} [answer.location] - The location URL of the created order
  * @property {Object} [answer.error] - Error details if order creation fails
+ * @property {Error} [answer.exception] - An error object if an exception occurs
  * @property {string} [nonce] - A new replay nonce for subsequent requests
  */
 export async function createOrder(kid, nonce, privateKey, newOrderUrl, identifiers) { /*...*/ }
@@ -117,6 +119,7 @@ export async function createOrder(kid, nonce, privateKey, newOrderUrl, identifie
  * @property {Object} [answer.get] - The finalized order details
  * @property {string} [answer.location] - The location URL of the finalized order
  * @property {Object} [answer.error] - Error details if finalization fails
+ * @property {Error} [answer.exception] - An error object if an exception occurs
  * @property {string} [nonce] - A new replay nonce for subsequent requests
  */
 export async function finalizeOrder(commonName, kid, nonce, privateKey, publicKeySign, privateKeySign, finalizeUrl, dnsNames) { /*...*/ }
@@ -138,6 +141,7 @@ export async function finalizeOrder(commonName, kid, nonce, privateKey, publicKe
  * @property {Object} [answer.get] - The retrieved resource details
  * @property {string} [answer.location] - The location URL of the resource
  * @property {Object} [answer.error] - Error details if retrieval fails
+ * @property {Error} [answer.exception] - An error object if an exception occurs
  * @property {string} [nonce] - A new replay nonce for subsequent requests
  */
 export async function postAsGet(kid, nonce, privateKey, url) { /*...*/ }
@@ -159,6 +163,7 @@ export async function postAsGet(kid, nonce, privateKey, url) { /*...*/ }
  * @property {Object} [answer.get] - The retrieved challenge details
  * @property {string} [answer.location] - The location URL of the challenge
  * @property {Object} [answer.error] - Error details if retrieval fails
+ * @property {Error} [answer.exception] - An error object if an exception occurs
  * @property {string} [nonce] - A new replay nonce for subsequent requests
  */
 export async function postAsGetChal(kid, nonce, privateKey, url) { /*...*/ }
