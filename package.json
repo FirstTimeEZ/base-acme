@@ -1,12 +1,13 @@
 {
   "name": "base-acme-client",
   "author": "FirstTimeEZ",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Implementation of the Automatic Certificate Management Environment in Javascript (RFC8555)",
   "main": "acme.js",
   "type": "module",
   "keywords": [
-    "RFC8555",
+    "rfc8555",
+    "acme-ari-07",
     "automatic",
     "certificate",
     "management",
@@ -23,7 +24,11 @@
     "client",
     "challenge",
     "http-01",
-    "dns"
+    "dns",
+    "ari",
+    "renewal",
+    "information",
+    "extension"
   ],
   "license": "Apache-2.0",
   "dependencies": {
