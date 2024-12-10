@@ -2,6 +2,8 @@
 
 A module for interacting with [`ACME`](https://datatracker.ietf.org/doc/html/rfc8555) servers for automated SSL/TLS certificate issuance and management.
 
+# Exports
+
 ### newDirectoryAsync
 
 ```javascript
@@ -244,3 +246,9 @@ export function formatPrivateKey(pem) { /*...*/ }
  */
 export function base64urlEncode(input) { /*...*/ }
 ```
+
+------
+
+# Full Working Examples
+
+This module is used by [`Lets Encrypt ACME Client`](https://github.com/FirstTimeEZ/acme) and [`Server SSL`](https://github.com/FirstTimeEZ/server-ssl)
