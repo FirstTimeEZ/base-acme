@@ -1,7 +1,7 @@
 {
   "name": "base-acme-client",
   "author": "FirstTimeEZ",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "Implementation of the Automatic Certificate Management Environment in Javascript (RFC8555)",
   "main": "acme.js",
   "type": "module",
@@ -32,7 +32,7 @@
   ],
   "license": "Apache-2.0",
   "dependencies": {
-    "simple-csr-generator": "^1.0.9"
+    "simple-csr-generator": "^1.0.11"
   },
   "repository": {
     "type": "git",
