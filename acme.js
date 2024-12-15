@@ -405,7 +405,7 @@ export async function fetchRequest(method, url, signedData) {
         body: signedData
     };
 
-    return await fetchAndRetryUntilOk(url, request);
+    return await fetch(url, request);
 }
 
 /**
