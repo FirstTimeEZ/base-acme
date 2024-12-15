@@ -37,15 +37,18 @@ const REPLAY_NONCE = 'replay-nonce';
  * @property {Response} [answer.error] - The error response if the request was unsuccessful
  */
 export async function newDirectoryAsync(mainDirectoryUrl) {
-    return new Promise((resolve) => {
-        fetch(mainDirectoryUrl, {
-            method: METHOD_GET
-        }).then(response => {
-            response.ok
-                ? response.json().then((result) => { resolve({ answer: { directory: result } }); }).catch((exception) => resolve({ answer: { exception: exception } }))
-                : resolve({ answer: { error: response } });
-        }).catch((exception) => resolve({ answer: { exception: exception } }));
-    });
+    try {
+        const response = await fetchAndRetryUntilOk(mainDirectoryUrl, { method: METHOD_GET });
+
+        if (response.ok) {
+            return await response.json().then((result) => { return { answer: { directory: result } } });
+        }
+        else {
+            return { answer: { error: response } };
+        }
+    } catch (exception) {
+        return { answer: { exception: exception } }
+    }
 }
 
 /**
@@ -62,26 +65,30 @@ export async function newDirectoryAsync(mainDirectoryUrl) {
  * @property {Response} [answer.error] - The error response if the request was unsuccessful
  */
 export async function newNonceAsync(newNonceUrl) {
-    let nonceUrl = newNonceUrl;
+    try {
+        let nonceUrl = newNonceUrl;
 
-    if (newNonceUrl == undefined) {
-        const directory = (await newDirectoryAsync()).answer.directory;
-        if (directory !== null) {
-            nonceUrl = directory.newNonce;
+        if (newNonceUrl == undefined) {
+            const directory = (await newDirectoryAsync()).answer.directory;
+            if (directory !== null) {
+                nonceUrl = directory.newNonce;
+            }
         }
-    }
 
-    if (nonceUrl !== null) {
-        return new Promise(async (resolve) => {
-            fetch(nonceUrl, {
-                method: METHOD_HEAD
-            }).then((response) => response.ok
-                ? resolve({ answer: { response: response }, nonce: response.headers.get(REPLAY_NONCE) })
-                : resolve({ answer: { error: response } }))
-                .catch((exception) => resolve({ answer: { exception: exception } }));;
-        });
-    } else {
-        return { answer: { error: "No directories found or newNonce is not available." } };
+        if (nonceUrl !== null) {
+            const response = await fetchAndRetryUntilOk(nonceUrl, { method: METHOD_HEAD });
+
+            if (response.ok) {
+                return { answer: { response: response }, nonce: response.headers.get(REPLAY_NONCE) };
+            }
+            else {
+                return { answer: { error: response } };
+            }
+        } else {
+            return { answer: { error: "No directories found or newNonce is not available." } };
+        }
+    } catch (exception) {
+        return { answer: { exception: exception } }
     }
 }
 
@@ -398,7 +405,7 @@ export async function fetchRequest(method, url, signedData) {
         body: signedData
     };
 
-    return await fetch(url, request);
+    return await fetchAndRetryUntilOk(url, request);
 }
 
 /**
@@ -478,6 +485,7 @@ export function hexToBytes(hex) {
  * Fetch a resource with multiple retry attempts and progressive backoff.
  * 
  * @param {string|Request} fetchInput - The URL or Request object to fetch
+ * @param {Object} init - optional fetch init object
  * @param {number} [attempts=6] - Maximum number of fetch attempts
  * @returns {Promise<Response|undefined>} The response or undefined if all attempts fail
  * 
@@ -497,13 +505,13 @@ export function hexToBytes(hex) {
  *   // Process successful response
  * }
  */
-export async function fetchAndRetryUntilOk(fetchInput, method, attempts = 6) {
+export async function fetchAndRetryUntilOk(fetchInput, init, attempts = 6) {
     let a = 1;
 
     while (a <= attempts) {
         a++;
         try {
-            const response = await fetch(fetchInput, method);
+            const response = await fetch(fetchInput, init);
 
             if (response.ok) {
                 return response;
