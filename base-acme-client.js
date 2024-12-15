@@ -115,6 +115,7 @@ export async function createJsonWebKey(publicKey) {
  * @param {string} newAccountUrl - The URL for creating a new account
  * @param {Object} privateKey - The private key for signing the request
  * @param {Object} jsonWebKey - The JSON Web Key representing the account's public key
+ * @param {Object} acmeDirectory - The ACME directory containing URLs for ACME operations
  * @returns {Promise<Object>} An object containing the account creation result
  * @property {Object} answer - Contains account details or error information
  * @property {Object} [answer.account] - The created account details
@@ -123,7 +124,7 @@ export async function createJsonWebKey(publicKey) {
  * @property {Error} [answer.exception] - An error object if an exception occurs
  * @property {string} [nonce] - A new replay nonce for subsequent requests
  */
-export async function createAccount(nonce, newAccountUrl, privateKey, jsonWebKey) {
+export async function createAccount(nonce, privateKey, jsonWebKey, acmeDirectory) {
     try {
         const payload = { termsOfServiceAgreed: true };
 
@@ -131,12 +132,10 @@ export async function createAccount(nonce, newAccountUrl, privateKey, jsonWebKey
             alg: ALG_ECDSA,
             jwk: jsonWebKey,
             nonce: nonce,
-            url: newAccountUrl,
+            url: acmeDirectory.newAccount,
         };
 
-        const signed = await signPayloadJson(payload, protectedHeader, privateKey);
-
-        const response = await fetchRequest(METHOD_POST, newAccountUrl, signed);
+        const response = await fetchAndRetryProtectedUntilOk(payload, protectedHeader, privateKey, acmeDirectory);
 
         if (response.ok) {
             return {
@@ -162,8 +161,8 @@ export async function createAccount(nonce, newAccountUrl, privateKey, jsonWebKey
  * @param {string} kid - Key Identifier for the account
  * @param {string} nonce - The replay nonce from the server
  * @param {Object} privateKey - The private key for signing the request
- * @param {string} newOrderUrl - The URL for creating a new order
  * @param {string[]} identifiers - Domain names to be included in the certificate
+ * @param {Object} acmeDirectory - The ACME directory containing URLs for ACME operations
  * @returns {Promise<Object>} An object containing the order creation result
  * @property {Object} answer - Contains order details or error information
  * @property {Object} [answer.order] - The created order details
@@ -172,7 +171,7 @@ export async function createAccount(nonce, newAccountUrl, privateKey, jsonWebKey
  * @property {Error} [answer.exception] - An error object if an exception occurs
  * @property {string} [nonce] - A new replay nonce for subsequent requests
  */
-export async function createOrder(kid, nonce, privateKey, newOrderUrl, identifiers) {
+export async function createOrder(kid, nonce, privateKey, identifiers, acmeDirectory) {
     try {
         const payload = { [SAN]: identifiers };
 
@@ -180,12 +179,10 @@ export async function createOrder(kid, nonce, privateKey, newOrderUrl, identifie
             alg: ALG_ECDSA,
             kid: kid,
             nonce: nonce,
-            url: newOrderUrl,
+            url: acmeDirectory.newOrder,
         };
 
-        const signed = await signPayloadJson(payload, protectedHeader, privateKey);
-
-        const response = await fetchRequest(METHOD_POST, newOrderUrl, signed);
+        const response = await fetchAndRetryProtectedUntilOk(payload, protectedHeader, privateKey, acmeDirectory);
 
         if (response.ok) {
             return {
@@ -215,6 +212,7 @@ export async function createOrder(kid, nonce, privateKey, newOrderUrl, identifie
  * @param {Object} publicKeySign - Public key used for signing the CSR
  * @param {Object} privateKeySign - Private key used for signing the CSR
  * @param {string} finalizeUrl - The URL for finalizing the order
+ * @param {Object} acmeDirectory - The ACME directory containing URLs for ACME operations
  * @param {string[]} dnsNames - Additional DNS names to be included in the certificate
  * @returns {Promise<Object>} An object containing the order finalization result
  * @property {Object} answer - Contains finalization details or error information
@@ -224,7 +222,7 @@ export async function createOrder(kid, nonce, privateKey, newOrderUrl, identifie
  * @property {Error} [answer.exception] - An error object if an exception occurs
  * @property {string} [nonce] - A new replay nonce for subsequent requests
  */
-export async function finalizeOrder(commonName, kid, nonce, privateKey, publicKeySign, privateKeySign, finalizeUrl, dnsNames) {
+export async function finalizeOrder(commonName, kid, nonce, privateKey, publicKeySign, privateKeySign, finalizeUrl, dnsNames, acmeDirectory) {
     try {
         const payload = { csr: await generateCSRWithExistingKeys(commonName, publicKeySign, privateKeySign, dnsNames) };
 
@@ -235,9 +233,7 @@ export async function finalizeOrder(commonName, kid, nonce, privateKey, publicKe
             url: finalizeUrl,
         };
 
-        const signed = await signPayloadJson(payload, protectedHeader, privateKey);
-
-        const response = await fetchRequest(METHOD_POST, finalizeUrl, signed);
+        const response = await fetchAndRetryProtectedUntilOk(payload, protectedHeader, privateKey, acmeDirectory);
 
         if (response.ok) {
             return {
@@ -264,6 +260,7 @@ export async function finalizeOrder(commonName, kid, nonce, privateKey, publicKe
  * @param {string} nonce - The replay nonce from the server
  * @param {Object} privateKey - The private key for signing the request
  * @param {string} url - The URL to retrieve status from
+ * @param {Object} acmeDirectory - The ACME directory containing URLs for ACME operations
  * @returns {Promise<Object>} An object containing the retrieved information
  * @property {Object} answer - Contains retrieved details or error information
  * @property {Object} [answer.get] - The retrieved resource details
@@ -272,7 +269,7 @@ export async function finalizeOrder(commonName, kid, nonce, privateKey, publicKe
  * @property {Error} [answer.exception] - An error object if an exception occurs
  * @property {string} [nonce] - A new replay nonce for subsequent requests
  */
-export async function postAsGet(kid, nonce, privateKey, url) {
+export async function postAsGet(kid, nonce, privateKey, url, acmeDirectory) {
     try {
         const protectedHeader = {
             alg: ALG_ECDSA,
@@ -281,9 +278,7 @@ export async function postAsGet(kid, nonce, privateKey, url) {
             url: url,
         };
 
-        const signed = await signPayload(METHOD_POST_AS_GET, protectedHeader, privateKey);
-
-        const response = await fetchRequest(METHOD_POST, url, signed);
+        const response = await fetchAndRetryProtectedUntilOk(METHOD_POST_AS_GET, protectedHeader, privateKey, acmeDirectory);
 
         if (response.ok) {
             return {
@@ -292,9 +287,11 @@ export async function postAsGet(kid, nonce, privateKey, url) {
             };
         }
         else {
+            const nextNonce = await newNonceAsync(acmeDirectory.newNonce);
+
             return {
                 answer: { error: await response.json() },
-                nonce: null
+                nonce: nextNonce.nonce ? nextNonce.nonce : null
             };
         }
     } catch (exception) {
@@ -310,6 +307,7 @@ export async function postAsGet(kid, nonce, privateKey, url) {
  * @param {string} nonce - The replay nonce from the server
  * @param {Object} privateKey - The private key for signing the request
  * @param {string} url - The URL to retrieve challenge details from
+ * @param {Object} acmeDirectory - The ACME directory containing URLs for ACME operations
  * @returns {Promise<Object>} An object containing the challenge details
  * @property {Object} answer - Contains challenge details or error information
  * @property {Object} [answer.get] - The retrieved challenge details
@@ -318,7 +316,7 @@ export async function postAsGet(kid, nonce, privateKey, url) {
  * @property {Error} [answer.exception] - An error object if an exception occurs
  * @property {string} [nonce] - A new replay nonce for subsequent requests
  */
-export async function postAsGetChal(kid, nonce, privateKey, url) {
+export async function postAsGetChal(kid, nonce, privateKey, url, acmeDirectory) {
     try {
         const protectedHeader = {
             alg: ALG_ECDSA,
@@ -327,9 +325,7 @@ export async function postAsGetChal(kid, nonce, privateKey, url) {
             url: url,
         };
 
-        const signed = await signPayloadJson(METHOD_POST_AS_GET_CHALLENGE, protectedHeader, privateKey);
-
-        const response = await fetchRequest(METHOD_POST, url, signed);
+        const response = await fetchAndRetryProtectedUntilOk(METHOD_POST_AS_GET_CHALLENGE, protectedHeader, privateKey, acmeDirectory);
 
         if (response.ok) {
             return {
@@ -338,9 +334,11 @@ export async function postAsGetChal(kid, nonce, privateKey, url) {
             };
         }
         else {
+            const nextNonce = await newNonceAsync(acmeDirectory.newNonce);
+
             return {
                 answer: { error: await response.json() },
-                nonce: null
+                nonce: nextNonce.nonce ? nextNonce.nonce : null
             };
         }
     } catch (exception) {
@@ -521,7 +519,86 @@ export async function fetchAndRetryUntilOk(fetchInput, init, attempts = 6) {
                 return response;
             }
 
+            console.log(a - 1, "attempt failed, trying again");
+
             await new Promise((resolve) => setTimeout(() => { resolve(); }, 650 * a)); // Each failed attempt will delay itself slightly more
+        } catch (exception) {
+            console.log(a - 1, exception);
+        }
+    }
+
+    return undefined;
+}
+
+/**
+ * Fetch a protected resource with multiple retry attempts and progressive backoff.
+ *
+ * @param {Object} payload - The payload to be sent with the request
+ * @param {Object} protectedHeader - The protected header containing metadata for the request
+ * @param {Object} privateKey - The private key for signing the request
+ * @param {Object} acmeDirectory - The ACME directory containing URLs for ACME operations
+ * @param {number} [attempts=6] - Maximum number of fetch attempts (default: 6)
+ * @returns {Promise<Response|undefined>} The response or undefined if all attempts fail
+ *
+ * @description
+ * This function attempts to fetch a protected resource with the following characteristics:
+ * - Starts with one fetch attempt
+ * - Increments attempts progressively
+ * - Implements an increasing delay between failed attempts (650ms * attempt number)
+ * - Logs any caught exceptions
+ * - Returns immediately on a successful (ok) response
+ * - Returns the last response or undefined if all attempts are exhausted
+ *
+ * @example
+ * const response = await fetchAndRetryProtectedUntilOk(
+ *   payload, 
+ *   protectedHeader, 
+ *   privateKey, 
+ *   acmeDirectory
+ * );
+ * if (response && response.ok) {
+ *   const data = await response.json();
+ *   // Process successful response
+ * }
+ */
+export async function fetchAndRetryProtectedUntilOk(payload, protectedHeader, privateKey, acmeDirectory, attempts = 3) {
+    let a = 1;
+
+    while (a <= attempts) {
+        a++;
+        try {
+            if (protectedHeader.nonce == undefined) {
+                const nextNonce = await newNonceAsync(acmeDirectory.newNonce);
+
+                if (nextNonce.nonce) {
+                    protectedHeader.nonce = nextNonce.nonce;
+                }
+                else {
+                    console.log(a - 1, "Could not get the next nonce so the attempt failed");
+
+                    await new Promise((resolve) => setTimeout(() => { resolve(); }, 650 * a)); // Each failed attempt will delay itself slightly more
+
+                    continue;
+                }
+            }
+
+            const signed = payload != "" ? await signPayloadJson(payload, protectedHeader, privateKey) : await signPayload("", protectedHeader, privateKey);
+
+            const response = await fetchRequest(METHOD_POST, protectedHeader.url, signed);
+
+            if (response.ok) {
+                return response;
+            }
+
+            if (a > attempts) {
+                return response;
+            }
+
+            protectedHeader.nonce = undefined;
+
+            console.log(a - 1, "attempt failed, trying again");
+
+            await new Promise((resolve) => setTimeout(() => { resolve(); }, 2250 * a)); // Each failed attempt will delay itself slightly more
         } catch (exception) {
             console.log(a - 1, exception);
         }

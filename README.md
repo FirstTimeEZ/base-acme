@@ -313,6 +313,43 @@ export function hexToBytes(hex) { /*...*/ }
 export async function fetchAndRetryUntilOk(fetchInput, init, attempts = 6) { /*...*/ }
 ```
 
+### fetchAndRetryProtectedUntilOk
+
+```javascript
+/**
+ * Fetch a protected resource with multiple retry attempts and progressive backoff.
+ *
+ * @param {Object} payload - The payload to be sent with the request
+ * @param {Object} protectedHeader - The protected header containing metadata for the request
+ * @param {Object} privateKey - The private key for signing the request
+ * @param {Object} acmeDirectory - The ACME directory containing URLs for ACME operations
+ * @param {number} [attempts=6] - Maximum number of fetch attempts (default: 6)
+ * @returns {Promise<Response|undefined>} The response or undefined if all attempts fail
+ *
+ * @description
+ * This function attempts to fetch a protected resource with the following characteristics:
+ * - Starts with one fetch attempt
+ * - Increments attempts progressively
+ * - Implements an increasing delay between failed attempts (650ms * attempt number)
+ * - Logs any caught exceptions
+ * - Returns immediately on a successful (ok) response
+ * - Returns the last response or undefined if all attempts are exhausted
+ *
+ * @example
+ * const response = await fetchAndRetryProtectedUntilOk(
+ *   payload, 
+ *   protectedHeader, 
+ *   privateKey, 
+ *   acmeDirectory
+ * );
+ * if (response && response.ok) {
+ *   const data = await response.json();
+ *   // Process successful response
+ * }
+ */
+export async function fetchAndRetryProtectedUntilOk(payload, protectedHeader, privateKey, acmeDirectory, attempts = 3) { /*...*/ }
+```
+
 ------
 
 # Full Working Examples
