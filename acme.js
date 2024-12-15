@@ -38,7 +38,7 @@ const REPLAY_NONCE = 'replay-nonce';
  */
 export async function newDirectoryAsync(mainDirectoryUrl) {
     return new Promise((resolve) => {
-        fetch(mainDirectoryUrl, { method: METHOD_GET }).then(response => {
+        fetchAndRetryUntilOk(mainDirectoryUrl, { method: METHOD_GET }).then(response => {
             response.ok
                 ? response.json().then((result) => { resolve({ answer: { directory: result } }); }).catch((exception) => resolve({ answer: { exception: exception } }))
                 : resolve({ answer: { error: response } });
@@ -71,7 +71,7 @@ export async function newNonceAsync(newNonceUrl) {
 
     if (nonceUrl !== null) {
         return new Promise(async (resolve) => {
-            fetch(nonceUrl, {
+            fetchAndRetryUntilOk(nonceUrl, {
                 method: METHOD_HEAD
             }).then((response) => response.ok
                 ? resolve({ answer: { response: response }, nonce: response.headers.get(REPLAY_NONCE) })
@@ -396,7 +396,7 @@ export async function fetchRequest(method, url, signedData) {
         body: signedData
     };
 
-    return await fetch(url, request);
+    return await fetchAndRetryUntilOk(url, request);
 }
 
 /**
@@ -414,7 +414,7 @@ export async function fetchRequest(method, url, signedData) {
 export async function fetchSuggestedWindow(renewalInfoUrl, aki, serial) {
     const url = `${renewalInfoUrl}/${base64urlEncode(hexToBytes(aki))}.${base64urlEncode(hexToBytes(serial))}`;
 
-    const response = await fetch(url);
+    const response = await fetchAndRetryUntilOk(url);
     if (response.ok) {
         return await response.json()
     }
@@ -470,4 +470,52 @@ export function hexToBytes(hex) {
         bytes[i / 2] = parseInt(hex.substring(i, i + 2), 16);
     }
     return bytes;
+}
+
+/**
+ * Fetch a resource with multiple retry attempts and progressive backoff.
+ * 
+ * @param {string|Request} fetchInput - The URL or Request object to fetch
+ * @param {number} [attempts=6] - Maximum number of fetch attempts
+ * @returns {Promise<Response|undefined>} The response or undefined if all attempts fail
+ * 
+ * @description
+ * This function attempts to fetch a resource with the following characteristics:
+ * - Starts with one fetch attempt
+ * - Increments attempts progressively
+ * - Implements an increasing delay between failed attempts (650ms * attempt number)
+ * - Logs any caught exceptions
+ * - Returns immediately on a successful (ok) response
+ * - Returns the last response or undefined if all attempts are exhausted
+ * 
+ * @example
+ * const response = await fetchAndRetyUntilOk('https://api.example.com/data');
+ * if (response && response.ok) {
+ *   const data = await response.json();
+ *   // Process successful response
+ * }
+ */
+export async function fetchAndRetryUntilOk(fetchInput, attempts = 6) {
+    let a = 1;
+
+    while (a <= attempts) {
+        a++;
+        try {
+            const response = await fetch(fetchInput);
+
+            if (response.ok) {
+                return response;
+            }
+
+            if (a > attempts) {
+                return response;
+            }
+
+            await new Promise((resolve) => setTimeout(() => { resolve(); }, 650 * a)); // Each failed attempt will delay itself slightly more
+        } catch (exception) {
+            console.log(a - 1, exception);
+        }
+    }
+
+    return undefined;
 }
