@@ -38,7 +38,9 @@ const REPLAY_NONCE = 'replay-nonce';
  */
 export async function newDirectoryAsync(mainDirectoryUrl) {
     return new Promise((resolve) => {
-        fetchAndRetryUntilOk(mainDirectoryUrl, { method: METHOD_GET }).then(response => {
+        fetch(mainDirectoryUrl, {
+            method: METHOD_GET
+        }).then(response => {
             response.ok
                 ? response.json().then((result) => { resolve({ answer: { directory: result } }); }).catch((exception) => resolve({ answer: { exception: exception } }))
                 : resolve({ answer: { error: response } });
@@ -71,7 +73,7 @@ export async function newNonceAsync(newNonceUrl) {
 
     if (nonceUrl !== null) {
         return new Promise(async (resolve) => {
-            fetchAndRetryUntilOk(nonceUrl, {
+            fetch(nonceUrl, {
                 method: METHOD_HEAD
             }).then((response) => response.ok
                 ? resolve({ answer: { response: response }, nonce: response.headers.get(REPLAY_NONCE) })
@@ -396,7 +398,7 @@ export async function fetchRequest(method, url, signedData) {
         body: signedData
     };
 
-    return await fetchAndRetryUntilOk(url, request);
+    return await fetch(url, request);
 }
 
 /**
@@ -414,7 +416,7 @@ export async function fetchRequest(method, url, signedData) {
 export async function fetchSuggestedWindow(renewalInfoUrl, aki, serial) {
     const url = `${renewalInfoUrl}/${base64urlEncode(hexToBytes(aki))}.${base64urlEncode(hexToBytes(serial))}`;
 
-    const response = await fetchAndRetryUntilOk(url);
+    const response = await fetch(url);
     if (response.ok) {
         return await response.json()
     }
@@ -495,13 +497,13 @@ export function hexToBytes(hex) {
  *   // Process successful response
  * }
  */
-export async function fetchAndRetryUntilOk(fetchInput, attempts = 6) {
+export async function fetchAndRetryUntilOk(fetchInput, method, attempts = 6) {
     let a = 1;
 
     while (a <= attempts) {
         a++;
         try {
-            const response = await fetch(fetchInput);
+            const response = await fetch(fetchInput, method);
 
             if (response.ok) {
                 return response;
