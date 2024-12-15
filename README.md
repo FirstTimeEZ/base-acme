@@ -283,6 +283,35 @@ export function base64urlEncode(input) { /*...*/ }
 export function hexToBytes(hex) { /*...*/ }
 ```
 
+### fetchAndRetryUntilOk
+
+```javascript
+/**
+ * Fetch a resource with multiple retry attempts and progressive backoff.
+ * 
+ * @param {string|Request} fetchInput - The URL or Request object to fetch
+ * @param {number} [attempts=6] - Maximum number of fetch attempts
+ * @returns {Promise<Response|undefined>} The response or undefined if all attempts fail
+ * 
+ * @description
+ * This function attempts to fetch a resource with the following characteristics:
+ * - Starts with one fetch attempt
+ * - Increments attempts progressively
+ * - Implements an increasing delay between failed attempts (650ms * attempt number)
+ * - Logs any caught exceptions
+ * - Returns immediately on a successful (ok) response
+ * - Returns the last response or undefined if all attempts are exhausted
+ * 
+ * @example
+ * const response = await fetchAndRetyUntilOk('https://api.example.com/data');
+ * if (response && response.ok) {
+ *   const data = await response.json();
+ *   // Process successful response
+ * }
+ */
+export async function fetchAndRetryUntilOk(fetchInput, attempts = 6) { /*...*/ }
+```
+
 ------
 
 # Full Working Examples
