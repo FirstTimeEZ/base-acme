@@ -31,6 +31,7 @@ const REPLAY_NONCE = 'replay-nonce';
  * @async
  * @function newDirectoryAsync
  * @param {string} mainDirectoryUrl - The URL of the ACME server's directory endpoint
+ * 
  * @returns {Promise<Object>} An object containing the directory information or an error
  * @property {Object|null} answer.directory - The parsed directory JSON or null
  * @property {Response} [answer.error] - The error response if the request was unsuccessful
@@ -59,6 +60,7 @@ export async function newDirectoryAsync(mainDirectoryUrl) {
  * @async
  * @function newNonceAsync
  * @param {string} [newNonceUrl] - Optional URL to fetch a new nonce. If not provided, it will be retrieved from the directory.
+ * 
  * @returns {Promise<Object>} An object containing the nonce or error details
  * @property {string} nonce - A new replay nonce for subsequent requests
  * @property {Object} [answer.error] - The error response if the request was unsuccessful
@@ -108,6 +110,7 @@ export async function newNonceAsync(newNonceUrl) {
  * @async
  * @function createJsonWebKey
  * @param {Object} publicKey - The public key to convert to JWK format
+ * 
  * @returns {Promise<Object>} An object containing the JWK and its thumbprint
  * @property {Object} key - The JSON Web Key representation
  * @property {string} print - Base64URL encoded thumbprint of the key
@@ -127,6 +130,7 @@ export async function createJsonWebKey(publicKey) {
  * @param {Object} privateKey - The private key for signing the request
  * @param {Object} jsonWebKey - The JSON Web Key representing the account's public key
  * @param {Object} acmeDirectory - The ACME directory containing URLs for ACME operations
+ * 
  * @returns {Promise<Object>} An object containing the account creation result
  * @property {Object} answer - Contains account details or error information
  * @property {Object|null} [answer.account] - The created account details
@@ -177,6 +181,7 @@ export async function createAccount(nonce, privateKey, jsonWebKey, acmeDirectory
  * @param {Object} privateKey - The private key for signing the request
  * @param {string[]} identifiers - Domain names to be included in the certificate
  * @param {Object} acmeDirectory - The ACME directory containing URLs for ACME operations
+ * 
  * @returns {Promise<Object>} An object containing the order creation result
  * @property {Object} answer - Contains order details or error information
  * @property {Object|null} [answer.order] - The created order details
@@ -231,6 +236,7 @@ export async function createOrder(kid, nonce, privateKey, identifiers, acmeDirec
  * @param {string} finalizeUrl - The URL for finalizing the order
  * @param {Object} acmeDirectory - The ACME directory containing URLs for ACME operations
  * @param {string[]} dnsNames - Additional DNS names to be included in the certificate
+ * 
  * @returns {Promise<Object>} An object containing the order finalization result
  * @property {Object} answer - Contains finalization details or error information
  * @property {Object|null} [answer.get] - The finalized order details
@@ -281,6 +287,7 @@ export async function finalizeOrder(commonName, kid, nonce, privateKey, publicKe
  * @param {Object} privateKey - The private key for signing the request
  * @param {string} url - The URL to retrieve status from
  * @param {Object} acmeDirectory - The ACME directory containing URLs for ACME operations
+ * 
  * @returns {Promise<Object>} An object containing the retrieved information
  * @property {Object} answer - Contains retrieved details or error information
  * @property {Object|null} [answer.get] - The retrieved resource details
@@ -331,6 +338,7 @@ export async function postAsGet(kid, nonce, privateKey, url, acmeDirectory) {
  * @param {Object} privateKey - The private key for signing the request
  * @param {string} url - The URL to retrieve challenge details from
  * @param {Object} acmeDirectory - The ACME directory containing URLs for ACME operations
+ * 
  * @returns {Promise<Object>} An object containing the challenge details
  * @property {Object} answer - Contains challenge details or error information
  * @property {Object|null} [answer.get] - The retrieved challenge details
@@ -379,6 +387,7 @@ export async function postAsGetChal(kid, nonce, privateKey, url, acmeDirectory) 
  * @param {Object} payload - The payload to be signed
  * @param {Object} protectedHeader - The protected header containing metadata
  * @param {Object} privateKey - The private key used for signing
+ * 
  * @returns {Promise<string>} A JSON Web Signature (JWS) string
  */
 export async function signPayloadJson(payload, protectedHeader, privateKey) {
@@ -392,6 +401,7 @@ export async function signPayloadJson(payload, protectedHeader, privateKey) {
  * @param {string|Object} payload - The payload to be signed
  * @param {Object} protectedHeader - The protected header containing metadata
  * @param {Object} privateKey - The private key used for signing
+ * 
  * @returns {Promise<string>} A JSON Web Signature (JWS) string
  */
 export async function signPayload(payload, protectedHeader, privateKey) {
@@ -415,6 +425,7 @@ export async function signPayload(payload, protectedHeader, privateKey) {
  * Formats a PEM-encoded public key to a key object.
  * @function formatPublicKey
  * @param {string} pem - The PEM-encoded public key
+ * 
  * @returns {Object} A formatted public key object
  */
 export function formatPublicKey(pem) {
@@ -425,6 +436,7 @@ export function formatPublicKey(pem) {
  * Formats a PEM-encoded private key to a key object.
  * @function formatPrivateKey
  * @param {string} pem - The PEM-encoded private key
+ * 
  * @returns {Object} A formatted private key object
  */
 export function formatPrivateKey(pem) {
@@ -435,6 +447,7 @@ export function formatPrivateKey(pem) {
  * Encodes input to a base64url-encoded string.
  * @function base64urlEncode
  * @param {string|Uint8Array} input - The input to encode
+ * 
  * @returns {string} A base64url-encoded string
  */
 export function base64urlEncode(input) {
@@ -450,6 +463,7 @@ export function base64urlEncode(input) {
  * Converts a hexadecimal string to a Uint8Array of bytes.
  * @function hexToBytes
  * @param {string} hex - The hexadecimal string to convert. It should contain an even number of characters.
+ * 
  * @returns {Uint8Array} A Uint8Array containing the byte values represented by the hexadecimal string.
  * @throws {Error} Throws an error if the input string has an odd length or contains invalid hexadecimal characters.
  */
@@ -467,6 +481,7 @@ export function hexToBytes(hex) {
  * @param {string|Request} fetchInput - The URL or Request object to fetch
  * @param {Object} init - optional fetch init object
  * @param {number} [attempts=6] - Maximum number of fetch attempts
+ * 
  * @returns {Promise<Response|undefined>} The response or undefined if all attempts fail
  * 
  * @description
@@ -520,6 +535,7 @@ export async function fetchAndRetryUntilOk(fetchInput, init, attempts = 6) {
  * @param {Object} privateKey - The private key for signing the request
  * @param {Object} acmeDirectory - The ACME directory containing URLs for ACME operations
  * @param {number} [attempts=6] - Maximum number of fetch attempts (default: 6)
+ * 
  * @returns {Promise<Response|undefined>} The response or undefined if all attempts fail
  *
  * @description
@@ -596,6 +612,7 @@ export async function fetchAndRetryProtectedUntilOk(payload, protectedHeader, pr
  * @param {string} method - The HTTP method to use (e.g., 'GET', 'POST')
  * @param {string} url - The URL to send the request to
  * @param {string} signedData - The signed payload to send
+ * 
  * @returns {Promise<Response>} The response from the server
  */
 export async function fetchRequest(method, url, signedData) {
