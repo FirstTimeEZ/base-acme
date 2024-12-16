@@ -41,10 +41,10 @@ export async function newDirectoryAsync(mainDirectoryUrl) {
 
         if (response) {
             if (response.ok) {
-                return await response.json().then((result) => { return { answer: { directory: result } } });
+                return { answer: { directory: await response.json() } };
             }
             else {
-                return { answer: { error: response } };
+                return { answer: { error: await response.json() } };
             }
         }
 
@@ -58,12 +58,9 @@ export async function newDirectoryAsync(mainDirectoryUrl) {
  * Retrieves a new nonce from the ACME server.
  * @async
  * @function newNonceAsync
- * @param {string} [newNonceUrl] - Optional URL to fetch a new nonce. 
- *                                  If not provided, it will be retrieved from the directory.
- * @returns {Promise<Object>} An object containing the nonce and response details
- * @property {string} [nonce] - The replay nonce retrieved from the server
- * @property {Object} answer - Contains response or error information
- * @property {Response} [answer.response] - The successful response
+ * @param {string} [newNonceUrl] - Optional URL to fetch a new nonce. If not provided, it will be retrieved from the directory.
+ * @returns {Promise<Object>} An object containing the nonce or error details
+ * @property {string} nonce - The replay nonce retrieved from the server
  * @property {Response} [answer.error] - The error response if the request was unsuccessful
  */
 export async function newNonceAsync(newNonceUrl) {
@@ -93,10 +90,10 @@ export async function newNonceAsync(newNonceUrl) {
 
         if (response) {
             if (response.ok) {
-                return { answer: { response: response }, nonce: response.headers.get(REPLAY_NONCE) };
+                return { answer: null, nonce: response.headers.get(REPLAY_NONCE) };
             }
             else {
-                return { answer: { error: response } };
+                return { answer: { error: await response.json() } };
             }
         }
 
