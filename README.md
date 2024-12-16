@@ -5,7 +5,8 @@ A module for interacting with [`ACME`](https://datatracker.ietf.org/doc/html/rfc
 # Exports
 
 ```javascript
-import * as bac from 'base-acme-client';
+import * as bac from 'base-acme-client'; // ES6
+const bac = require('base-acme-client'); // CommonJS
 ```
 
 ### newDirectory
