@@ -81,8 +81,8 @@ export async function newNonce(newNonceUrl) {
                 answer: {
                     error: {
                         type: `bac:failed:newNonce`,
-                        detail: `No directories found or newNonce is not available.`,
-                        status: 777777
+                        detail: `No acme directory found or newNonce is not available.`,
+                        status: 777778
                     }
                 }
             };
