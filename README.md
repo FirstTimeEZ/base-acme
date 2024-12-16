@@ -550,7 +550,7 @@ Errors and Exceptions will be returned in an object
   }
 }
 
-// Errors
+// Error from the Base ACME Client
 {
   answer: {
     error: {
@@ -560,9 +560,18 @@ Errors and Exceptions will be returned in an object
     }
   }
 }
-```
 
-Errors returned by the `ACME` server itself will also be returned inside an `answer` object
+// Error from the ACME Server
+{
+  answer: {
+    error: {
+      type: 'urn:ietf:params:acme:error:orderNotReady',
+      detail: `Order's status ("valid") is not acceptable for finalization`,
+      status: 403
+    }
+  }
+}
+```
 
 ------------
 
