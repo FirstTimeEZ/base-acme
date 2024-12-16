@@ -59,7 +59,7 @@ export async function newDirectory(mainDirectoryUrl) {
  * Retrieves a new nonce from the ACME server.
  * @async
  * 
- * @param {string} [newNonceUrl] - Optional URL to fetch a new nonce. If not provided, it will be retrieved from the directory.
+ * @param {string} [newNonceUrl] - ACME Directory URL to fetch a new nonce.
  * 
  * @returns {Promise<Object>} An object containing the nonce or error details
  * @property {string} nonce - A new replay nonce for subsequent requests
@@ -67,10 +67,6 @@ export async function newDirectory(mainDirectoryUrl) {
  */
 export async function newNonce(newNonceUrl) {
     try {
-        if (newNonceUrl == undefined) {
-            return { answer: errorTemplate("bac:failed:newNonce", "No acme directory found or newNonce is not available.", 777778) };
-        }
-
         const response = await fetchAndRetryUntilOk(newNonceUrl, { method: METHOD_HEAD });
 
         if (response) {
@@ -670,7 +666,7 @@ function notCompletedError(error, exception) {
         answer:
             !exception
                 ? errorTemplate(`bac:failed:${error}`, `Could not complete ${error} after multiple attempts`, 777777)
-                : errorTemplate(`bac:exception:${error}`, exception, 777777)
+                : errorTemplate(`bac:exception:${error}`, exception, 777779)
     }
 }
 
