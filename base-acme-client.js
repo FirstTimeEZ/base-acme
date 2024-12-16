@@ -670,3 +670,24 @@ function errorTemplate(type, details, status) {
         }
     }
 }
+
+module.exports = {
+    newDirectory,
+    newNonce,
+    createJsonWebKey,
+    createAccount,
+    createOrder,
+    finalizeOrder,
+    postAsGet,
+    postAsGetChal,
+    signPayloadJson,
+    signPayload,
+    formatPublicKey,
+    formatPrivateKey,
+    base64urlEncode,
+    hexToBytes,
+    fetchRequest,
+    fetchSuggestedWindow,
+    fetchAndRetryUntilOk,
+    fetchAndRetryProtectedUntilOk
+};
