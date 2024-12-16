@@ -476,6 +476,61 @@ export function hexToBytes(hex) {
 }
 
 /**
+ * Sends a signed request to the ACME server.
+ * @async
+ * @function fetchRequest
+ * @param {string} method - The HTTP method to use (e.g., 'GET', 'POST')
+ * @param {string} url - The URL to send the request to
+ * @param {string} signedData - The signed payload to send
+ * 
+ * @returns {Promise<Response>} The response from the server
+ */
+export async function fetchRequest(method, url, signedData) {
+    const request = {
+        method: method,
+        headers: {
+            [CONTENT_TYPE]: CONTENT_TYPE_JOSE
+        },
+        body: signedData
+    };
+
+    return await fetch(url, request);
+}
+
+/**
+ * Fetches the suggested renewal window information for a certificate from the specified URL.
+ * @async
+ * @function fetchSuggestedWindow
+ * @param {string} renewalInfoUrl - The base URL for fetching renewal information.
+ * @param {string} aki- The Authority Key Identifier in hexadecimal format.
+ * @param {string} serial - The serial number in hexadecimal format.
+ * 
+ * @returns {Promise<Object>} A promise that resolves to the parsed JSON of the suggested window
+ * @property {Object} answer - Contains suggested window or error information
+ * @property {Object|null} [answer.get] - The retrieved suggested window
+ * @property {Object} [answer.error] - Error details if retrieval fails
+ * 
+ * @throws {Error} Throws an error if the fetch operation fails.
+ */
+export async function fetchSuggestedWindow(renewalInfoUrl, aki, serial) {
+    try {
+        const url = `${renewalInfoUrl}/${base64urlEncode(hexToBytes(aki))}.${base64urlEncode(hexToBytes(serial))}`;
+
+        const response = await fetchAndRetryUntilOk(url);
+
+        if (response) {
+            if (response.ok) {
+                return { answer: { get: await response.json() } }
+            }
+        }
+
+        return returnErrorTemplate("fetchSuggestedWindow");
+    } catch (exception) {
+        return returnErrorTemplate("fetchSuggestedWindow", exception);
+    }
+}
+
+/**
  * Fetch a resource with multiple retry attempts and progressive backoff.
  * 
  * @param {string|Request} fetchInput - The URL or Request object to fetch
@@ -603,61 +658,6 @@ export async function fetchAndRetryProtectedUntilOk(payload, protectedHeader, pr
     }
 
     return undefined;
-}
-
-/**
- * Sends a signed request to the ACME server.
- * @async
- * @function fetchRequest
- * @param {string} method - The HTTP method to use (e.g., 'GET', 'POST')
- * @param {string} url - The URL to send the request to
- * @param {string} signedData - The signed payload to send
- * 
- * @returns {Promise<Response>} The response from the server
- */
-export async function fetchRequest(method, url, signedData) {
-    const request = {
-        method: method,
-        headers: {
-            [CONTENT_TYPE]: CONTENT_TYPE_JOSE
-        },
-        body: signedData
-    };
-
-    return await fetch(url, request);
-}
-
-/**
- * Fetches the suggested renewal window information for a certificate from the specified URL.
- * @async
- * @function fetchSuggestedWindow
- * @param {string} renewalInfoUrl - The base URL for fetching renewal information.
- * @param {string} aki- The Authority Key Identifier in hexadecimal format.
- * @param {string} serial - The serial number in hexadecimal format.
- * 
- * @returns {Promise<Object>} A promise that resolves to the parsed JSON of the suggested window
- * @property {Object} answer - Contains suggested window or error information
- * @property {Object} [answer.get] - The retrieved suggested window
- * @property {Object} [answer.error] - Error details if retrieval fails
- * 
- * @throws {Error} Throws an error if the fetch operation fails.
- */
-export async function fetchSuggestedWindow(renewalInfoUrl, aki, serial) {
-    try {
-        const url = `${renewalInfoUrl}/${base64urlEncode(hexToBytes(aki))}.${base64urlEncode(hexToBytes(serial))}`;
-
-        const response = await fetchAndRetryUntilOk(url);
-
-        if (response) {
-            if (response.ok) {
-                return { answer: { get: await response.json() } }
-            }
-        }
-
-        return returnErrorTemplate("fetchSuggestedWindow");
-    } catch (exception) {
-        return returnErrorTemplate("fetchSuggestedWindow", exception);
-    }
 }
 
 function returnErrorTemplate(error, exception) {
