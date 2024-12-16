@@ -8,7 +8,7 @@ A module for interacting with [`ACME`](https://datatracker.ietf.org/doc/html/rfc
 import * as bac from 'base-acme-client';
 ```
 
-### newDirectoryAsync
+### newDirectory
 
 Fetches the directory information from an ACME server.
 
@@ -33,7 +33,7 @@ export async function newDirectory(mainDirectoryUrl) { /*...*/ }
 
 ------------
 
-### newNonceAsync
+### newNonce
 
 Retrieves a new nonce from the ACME server.
 
