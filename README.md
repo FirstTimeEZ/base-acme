@@ -364,6 +364,38 @@ export async function fetchAndRetryProtectedUntilOk(payload, protectedHeader, pr
 
 ------
 
+# Errors/Exceptions
+
+Errors and Exceptions will be returned in an object
+
+```
+// Exceptions
+{
+    answer: {
+      error: {
+        type: 'bac:exception:methodName',
+        detail: Error: methodName
+            at file:///base-acme/test/testing.js:11:47
+            at process.processTicksAndRejections (node:internal/process/task_queues:105:5),
+        status: 777777
+      }
+    }
+}
+
+// Errors
+{
+    answer: {
+      error: {
+        type: 'bac:failed:methodName',
+        detail: 'Could not complete methodName after multiple attempts',
+        status: 777777
+      }
+    }
+}
+```
+
+------
+
 # Full Working Examples
 
 This module is used by [`Lets Encrypt ACME Client`](https://github.com/FirstTimeEZ/acme) and [`Server SSL`](https://github.com/FirstTimeEZ/server-ssl)
