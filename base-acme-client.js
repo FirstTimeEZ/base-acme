@@ -49,9 +49,9 @@ export async function newDirectory(mainDirectoryUrl) {
             }
         }
 
-        return returnErrorTemplate("newDirectoryAsync");
+        return returnErrorTemplate("newDirectory");
     } catch (exception) {
-        return returnErrorTemplate("newDirectoryAsync", exception);
+        return returnErrorTemplate("newDirectory", exception);
     }
 }
 
@@ -70,7 +70,7 @@ export async function newNonce(newNonceUrl) {
         let nonceUrl = newNonceUrl;
 
         if (newNonceUrl == undefined) {
-            const directory = (await newDirectoryAsync()).answer.directory;
+            const directory = (await newDirectory()).answer.directory;
             if (directory !== null) {
                 nonceUrl = directory.newNonce;
             }
@@ -80,7 +80,7 @@ export async function newNonce(newNonceUrl) {
             return {
                 answer: {
                     error: {
-                        type: `bac:failed:newNonceAsync`,
+                        type: `bac:failed:newNonce`,
                         detail: `No directories found or newNonce is not available.`,
                         status: 777777
                     }
@@ -99,9 +99,9 @@ export async function newNonce(newNonceUrl) {
             }
         }
 
-        return returnErrorTemplate("newNonceAsync");
+        return returnErrorTemplate("newNonce");
     } catch (exception) {
-        return returnErrorTemplate("newNonceAsync", exception);
+        return returnErrorTemplate("newNonce", exception);
     }
 }
 
@@ -314,7 +314,7 @@ export async function postAsGet(kid, nonce, privateKey, url, acmeDirectory) {
                 };
             }
             else {
-                const nextNonce = await newNonceAsync(acmeDirectory.newNonce);
+                const nextNonce = await newNonce(acmeDirectory.newNonce);
 
                 return {
                     answer: { error: await response.json() },
@@ -365,7 +365,7 @@ export async function postAsGetChal(kid, nonce, privateKey, url, acmeDirectory) 
                 };
             }
             else {
-                const nextNonce = await newNonceAsync(acmeDirectory.newNonce);
+                const nextNonce = await newNonce(acmeDirectory.newNonce);
 
                 return {
                     answer: { error: await response.json() },
@@ -623,7 +623,7 @@ export async function fetchAndRetryProtectedUntilOk(payload, protectedHeader, pr
         a++;
         try {
             if (protectedHeader.nonce == undefined) {
-                const nextNonce = await newNonceAsync(acmeDirectory.newNonce);
+                const nextNonce = await newNonce(acmeDirectory.newNonce);
 
                 if (nextNonce.nonce) {
                     protectedHeader.nonce = nextNonce.nonce;
