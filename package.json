@@ -1,7 +1,7 @@
 {
   "name": "base-acme-client",
   "author": "FirstTimeEZ",
-  "version": "20.0.1",
+  "version": "20.0.2",
   "description": "Implementation of the Automatic Certificate Management Environment in Javascript (RFC8555)",
   "main": "base-acme-client.js",
   "type": "module",

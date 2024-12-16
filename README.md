@@ -4,6 +4,10 @@ A module for interacting with [`ACME`](https://datatracker.ietf.org/doc/html/rfc
 
 # Exports
 
+```javascript
+import * as bac from 'base-acme-client';
+```
+
 ### newDirectoryAsync
 
 Fetches the directory information from an ACME server.
@@ -26,6 +30,8 @@ export async function newDirectory(mainDirectoryUrl) { /*...*/ }
 ```
 
 </details>
+
+------------
 
 ### newNonceAsync
 
@@ -50,6 +56,8 @@ export async function newNonce(newNonceUrl) { /*...*/ }
 
 </details>
 
+------------
+
 ### createJsonWebKey
 
 Creates a JSON Web Key (JWK) from a public key.
@@ -72,6 +80,8 @@ export async function createJsonWebKey(publicKey) { /*...*/ }
 ```
 
 </details>
+
+------------
 
 ### createAccount
 
@@ -103,6 +113,8 @@ export async function createAccount(nonce, newAccountUrl, privateKey, jsonWebKey
 
 </details>
 
+------------
+
 ### createOrder
 
 Creates a new order for certificate issuance on the ACME server.
@@ -132,6 +144,8 @@ export async function createOrder(kid, nonce, privateKey, newOrderUrl, identifie
 ```
 
 </details>
+
+------------
 
 ### finalizeOrder
 
@@ -167,6 +181,8 @@ export async function finalizeOrder(commonName, kid, nonce, privateKey, publicKe
 
 </details>
 
+------------
+
 ### postAsGet
 
 Performs a POST-as-GET request to retrieve order or authorization status.
@@ -196,6 +212,8 @@ export async function postAsGet(kid, nonce, privateKey, url) { /*...*/ }
 ```
 
 </details>
+
+------------
 
 ### postAsGetChal
 
@@ -227,6 +245,8 @@ export async function postAsGetChal(kid, nonce, privateKey, url) { /*...*/ }
 
 </details>
 
+------------
+
 ### signPayloadJson
 
 Signs a JSON payload for ACME server requests.
@@ -249,6 +269,8 @@ export async function signPayloadJson(payload, protectedHeader, privateKey) { /*
 ```
 
 </details>
+
+------------
 
 ### signPayload
 
@@ -273,6 +295,8 @@ export async function signPayload(payload, protectedHeader, privateKey) { /*...*
 
 </details>
 
+------------
+
 ### formatPublicKey
 
 Formats a PEM-encoded public key to a key object.
@@ -292,6 +316,8 @@ export function formatPublicKey(pem) { /*...*/ }
 ```
 
 </details>
+
+------------
 
 ### formatPrivateKey
 
@@ -313,6 +339,8 @@ export function formatPrivateKey(pem) { /*...*/ }
 
 </details>
 
+------------
+
 ### base64urlEncode
 
 Encodes input to a base64url-encoded string.
@@ -332,6 +360,8 @@ export function base64urlEncode(input) { /*...*/ }
 ```
 
 </details>
+
+------------
 
 ### hexToBytes
 
@@ -353,6 +383,8 @@ export function hexToBytes(hex) { /*...*/ }
 ```
 
 </details>
+
+------------
 
 ### fetchRequest
 
@@ -376,6 +408,8 @@ export async function fetchRequest(method, url, signedData) { /*...*/ }
 ```
 
 </details>
+
+------------
 
 ### fetchSuggestedWindow
 
@@ -404,6 +438,8 @@ export async function fetchSuggestedWindow(renewalInfoUrl, aki, serial) { /*...*
 ```
 
 </details>
+
+------------
 
 ### fetchAndRetryUntilOk
 
@@ -443,6 +479,8 @@ export async function fetchAndRetryUntilOk(fetchInput, init, attempts = 6) { /*.
 ```
 
 </details>
+
+------------
 
 ### fetchAndRetryProtectedUntilOk
 
@@ -490,7 +528,7 @@ export async function fetchAndRetryProtectedUntilOk(payload, protectedHeader, pr
 
 </details>
 
-------
+------------
 
 # Errors/Exceptions
 
@@ -524,7 +562,7 @@ Errors and Exceptions will be returned in an object
 }
 ```
 
-------
+------------
 
 # Full Working Examples
 
