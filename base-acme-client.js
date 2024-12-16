@@ -78,7 +78,15 @@ export async function newNonceAsync(newNonceUrl) {
         }
 
         if (nonceUrl === null) {
-            return { answer: { error: "No directories found or newNonce is not available." } };
+            return {
+                answer: {
+                    error: {
+                        type: `bac:failed:newNonceAsync`,
+                        detail: `No directories found or newNonce is not available.`,
+                        status: 777777
+                    }
+                }
+            };
         }
 
         const response = await fetchAndRetryUntilOk(nonceUrl, { method: METHOD_HEAD });
