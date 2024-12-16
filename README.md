@@ -6,6 +6,11 @@ A module for interacting with [`ACME`](https://datatracker.ietf.org/doc/html/rfc
 
 ### newDirectoryAsync
 
+Fetches the directory information from an ACME server.
+
+<details>
+<summary><b>Show jsdoc</b></summary>
+
 ```javascript
 /**
  * Fetches the directory information from an ACME server.
@@ -20,7 +25,14 @@ A module for interacting with [`ACME`](https://datatracker.ietf.org/doc/html/rfc
 export async function newDirectoryAsync(mainDirectoryUrl) { /*...*/ }
 ```
 
+</details>
+
 ### newNonceAsync
+
+Retrieves a new nonce from the ACME server.
+
+<details>
+<summary><b>Show jsdoc</b></summary>
 
 ```javascript
 /**
@@ -36,7 +48,14 @@ export async function newDirectoryAsync(mainDirectoryUrl) { /*...*/ }
 export async function newNonceAsync(newNonceUrl) { /*...*/ }
 ```
 
+</details>
+
 ### createJsonWebKey
+
+Creates a JSON Web Key (JWK) from a public key.
+
+<details>
+<summary><b>Show jsdoc</b></summary>
 
 ```javascript
 /**
@@ -52,7 +71,14 @@ export async function newNonceAsync(newNonceUrl) { /*...*/ }
 export async function createJsonWebKey(publicKey) { /*...*/ }
 ```
 
+</details>
+
 ### createAccount
+
+Creates a new account on the ACME server.
+
+<details>
+<summary><b>Show jsdoc</b></summary>
 
 ```javascript
 /**
@@ -75,7 +101,14 @@ export async function createJsonWebKey(publicKey) { /*...*/ }
 export async function createAccount(nonce, newAccountUrl, privateKey, jsonWebKey) { /*...*/ }
 ```
 
+</details>
+
 ### createOrder
+
+Creates a new order for certificate issuance on the ACME server.
+
+<details>
+<summary><b>Show jsdoc</b></summary>
 
 ```javascript
 /**
@@ -98,7 +131,14 @@ export async function createAccount(nonce, newAccountUrl, privateKey, jsonWebKey
 export async function createOrder(kid, nonce, privateKey, newOrderUrl, identifiers) { /*...*/ }
 ```
 
+</details>
+
 ### finalizeOrder
+
+Finalizes a certificate order by submitting a Certificate Signing Request (CSR).
+
+<details>
+<summary><b>Show jsdoc</b></summary>
 
 ```javascript
 /**
@@ -125,7 +165,14 @@ export async function createOrder(kid, nonce, privateKey, newOrderUrl, identifie
 export async function finalizeOrder(commonName, kid, nonce, privateKey, publicKeySign, privateKeySign, finalizeUrl, dnsNames) { /*...*/ }
 ```
 
+</details>
+
 ### postAsGet
+
+Performs a POST-as-GET request to retrieve order or authorization status.
+
+<details>
+<summary><b>Show jsdoc</b></summary>
 
 ```javascript
 /**
@@ -148,7 +195,14 @@ export async function finalizeOrder(commonName, kid, nonce, privateKey, publicKe
 export async function postAsGet(kid, nonce, privateKey, url) { /*...*/ }
 ```
 
+</details>
+
 ### postAsGetChal
+
+Performs a POST-as-GET request for challenges
+
+<details>
+<summary><b>Show jsdoc</b></summary>
 
 ```javascript
 /**
@@ -171,7 +225,14 @@ export async function postAsGet(kid, nonce, privateKey, url) { /*...*/ }
 export async function postAsGetChal(kid, nonce, privateKey, url) { /*...*/ }
 ```
 
+</details>
+
 ### signPayloadJson
+
+Signs a JSON payload for ACME server requests.
+
+<details>
+<summary><b>Show jsdoc</b></summary>
 
 ```javascript
 /**
@@ -187,7 +248,14 @@ export async function postAsGetChal(kid, nonce, privateKey, url) { /*...*/ }
 export async function signPayloadJson(payload, protectedHeader, privateKey) { /*...*/ }
 ```
 
+</details>
+
 ### signPayload
+
+Signs a payload for ACME server requests.
+
+<details>
+<summary><b>Show jsdoc</b></summary>
 
 ```javascript
 /**
@@ -203,7 +271,14 @@ export async function signPayloadJson(payload, protectedHeader, privateKey) { /*
 export async function signPayload(payload, protectedHeader, privateKey) { /*...*/ }
 ```
 
+</details>
+
 ### formatPublicKey
+
+Formats a PEM-encoded public key to a key object.
+
+<details>
+<summary><b>Show jsdoc</b></summary>
 
 ```javascript
 /**
@@ -216,7 +291,14 @@ export async function signPayload(payload, protectedHeader, privateKey) { /*...*
 export function formatPublicKey(pem) { /*...*/ }
 ```
 
+</details>
+
 ### formatPrivateKey
+
+Formats a PEM-encoded private key to a key object.
+
+<details>
+<summary><b>Show jsdoc</b></summary>
 
 ```javascript
 /**
@@ -229,7 +311,14 @@ export function formatPublicKey(pem) { /*...*/ }
 export function formatPrivateKey(pem) { /*...*/ }
 ```
 
+</details>
+
 ### base64urlEncode
+
+Encodes input to a base64url-encoded string.
+
+<details>
+<summary><b>Show jsdoc</b></summary>
 
 ```javascript
 /**
@@ -242,7 +331,14 @@ export function formatPrivateKey(pem) { /*...*/ }
 export function base64urlEncode(input) { /*...*/ }
 ```
 
+</details>
+
 ### hexToBytes
+
+Converts a hexadecimal string to a Uint8Array of bytes.
+
+<details>
+<summary><b>Show jsdoc</b></summary>
 
 ```javascript
 /**
@@ -256,7 +352,14 @@ export function base64urlEncode(input) { /*...*/ }
 export function hexToBytes(hex) { /*...*/ }
 ```
 
+</details>
+
 ### fetchRequest
+
+Sends a signed request to the ACME server.
+
+<details>
+<summary><b>Show jsdoc</b></summary>
 
 ```javascript
 /**
@@ -272,7 +375,14 @@ export function hexToBytes(hex) { /*...*/ }
 export async function fetchRequest(method, url, signedData) { /*...*/ }
 ```
 
+</details>
+
 ### fetchSuggestedWindow
+
+Fetches the suggested renewal window information for a certificate from the specified URL.
+
+<details>
+<summary><b>Show jsdoc</b></summary>
 
 ```javascript
 /**
@@ -293,7 +403,14 @@ export async function fetchRequest(method, url, signedData) { /*...*/ }
 export async function fetchSuggestedWindow(renewalInfoUrl, aki, serial) { /*...*/ }
 ```
 
+</details>
+
 ### fetchAndRetryUntilOk
+
+Fetch a resource with multiple retry attempts and progressive backoff.
+
+<details>
+<summary><b>Show jsdoc</b></summary>
 
 ```javascript
 /**
@@ -324,7 +441,14 @@ export async function fetchSuggestedWindow(renewalInfoUrl, aki, serial) { /*...*
 export async function fetchAndRetryUntilOk(fetchInput, init, attempts = 6) { /*...*/ }
 ```
 
+</details>
+
 ### fetchAndRetryProtectedUntilOk
+
+Fetch a protected resource with multiple retry attempts and progressive backoff.
+
+<details>
+<summary><b>Show jsdoc</b></summary>
 
 ```javascript
 /**
@@ -361,6 +485,8 @@ export async function fetchAndRetryUntilOk(fetchInput, init, attempts = 6) { /*.
  */
 export async function fetchAndRetryProtectedUntilOk(payload, protectedHeader, privateKey, acmeDirectory, attempts = 3) { /*...*/ }
 ```
+
+</details>
 
 ------
 
