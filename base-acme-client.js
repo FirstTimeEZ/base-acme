@@ -67,20 +67,11 @@ export async function newDirectory(mainDirectoryUrl) {
  */
 export async function newNonce(newNonceUrl) {
     try {
-        let nonceUrl = newNonceUrl;
-
         if (newNonceUrl == undefined) {
-            const directory = (await newDirectory()).answer.directory;
-            if (directory !== null) {
-                nonceUrl = directory.newNonce;
-            }
-        }
-
-        if (nonceUrl == undefined) {
             return { answer: errorTemplate("bac:failed:newNonce", "No acme directory found or newNonce is not available.", 777778) };
         }
 
-        const response = await fetchAndRetryUntilOk(nonceUrl, { method: METHOD_HEAD });
+        const response = await fetchAndRetryUntilOk(newNonceUrl, { method: METHOD_HEAD });
 
         if (response) {
             if (response.ok) {
