@@ -10,7 +10,7 @@ import * as bac from 'base-acme-client';
 
 ### newDirectory
 
-Fetches the directory information from an ACME server.
+Fetches the directory information from an `ACME` server.
 
 <details>
 <summary><b>Show jsdoc</b></summary>
@@ -35,7 +35,7 @@ export async function newDirectory(mainDirectoryUrl) { /*...*/ }
 
 ### newNonce
 
-Retrieves a new nonce from the ACME server.
+Retrieves a new nonce from the `ACME` server.
 
 <details>
 <summary><b>Show jsdoc</b></summary>
@@ -85,7 +85,7 @@ export async function createJsonWebKey(publicKey) { /*...*/ }
 
 ### createAccount
 
-Creates a new account on the ACME server.
+Creates a new account on the `ACME` server.
 
 <details>
 <summary><b>Show jsdoc</b></summary>
@@ -117,7 +117,7 @@ export async function createAccount(nonce, newAccountUrl, privateKey, jsonWebKey
 
 ### createOrder
 
-Creates a new order for certificate issuance on the ACME server.
+Creates a new order for certificate issuance on the `ACME` server.
 
 <details>
 <summary><b>Show jsdoc</b></summary>
@@ -249,7 +249,7 @@ export async function postAsGetChal(kid, nonce, privateKey, url) { /*...*/ }
 
 ### signPayloadJson
 
-Signs a JSON payload for ACME server requests.
+Signs a JSON payload for `ACME` server requests.
 
 <details>
 <summary><b>Show jsdoc</b></summary>
@@ -274,7 +274,7 @@ export async function signPayloadJson(payload, protectedHeader, privateKey) { /*
 
 ### signPayload
 
-Signs a payload for ACME server requests.
+Signs a payload for `ACME` server requests.
 
 <details>
 <summary><b>Show jsdoc</b></summary>
@@ -388,7 +388,7 @@ export function hexToBytes(hex) { /*...*/ }
 
 ### fetchRequest
 
-Sends a signed request to the ACME server.
+Sends a signed request to the `ACME` server.
 
 <details>
 <summary><b>Show jsdoc</b></summary>
@@ -552,15 +552,17 @@ Errors and Exceptions will be returned in an object
 
 // Errors
 {
-    answer: {
-      error: {
-        type: 'bac:failed:methodName',
-        detail: 'Could not complete methodName after multiple attempts',
-        status: 777777
-      }
+  answer: {
+    error: {
+      type: 'bac:failed:methodName',
+      detail: 'Could not complete methodName after multiple attempts',
+      status: 777777
     }
+  }
 }
 ```
+
+Errors returned by the `ACME` server itself will also be returned inside an `answer` object
 
 ------------
 
