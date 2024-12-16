@@ -60,8 +60,8 @@ export async function newDirectoryAsync(mainDirectoryUrl) {
  * @function newNonceAsync
  * @param {string} [newNonceUrl] - Optional URL to fetch a new nonce. If not provided, it will be retrieved from the directory.
  * @returns {Promise<Object>} An object containing the nonce or error details
- * @property {string} nonce - The replay nonce retrieved from the server
- * @property {Response} [answer.error] - The error response if the request was unsuccessful
+ * @property {string} nonce - A new replay nonce for subsequent requests
+ * @property {Object} [answer.error] - The error response if the request was unsuccessful
  */
 export async function newNonceAsync(newNonceUrl) {
     try {
@@ -132,7 +132,7 @@ export async function createJsonWebKey(publicKey) {
  * @property {Object} [answer.account] - The created account details
  * @property {string} [answer.location] - The location URL of the created account
  * @property {Object} [answer.error] - Error details if account creation fails
- * @property {string} [nonce] - A new replay nonce for subsequent requests
+ * @property {string} nonce - A new replay nonce for subsequent requests
  */
 export async function createAccount(nonce, privateKey, jsonWebKey, acmeDirectory) {
     try {
@@ -182,7 +182,7 @@ export async function createAccount(nonce, privateKey, jsonWebKey, acmeDirectory
  * @property {Object} [answer.order] - The created order details
  * @property {string} [answer.location] - The location URL of the created order
  * @property {Object} [answer.error] - Error details if order creation fails
- * @property {string} [nonce] - A new replay nonce for subsequent requests
+ * @property {string} nonce - A new replay nonce for subsequent requests
  */
 export async function createOrder(kid, nonce, privateKey, identifiers, acmeDirectory) {
     try {
@@ -236,7 +236,7 @@ export async function createOrder(kid, nonce, privateKey, identifiers, acmeDirec
  * @property {Object} [answer.get] - The finalized order details
  * @property {string} [answer.location] - The location URL of the finalized order
  * @property {Object} [answer.error] - Error details if finalization fails
- * @property {string} [nonce] - A new replay nonce for subsequent requests
+ * @property {string} nonce - A new replay nonce for subsequent requests
  */
 export async function finalizeOrder(commonName, kid, nonce, privateKey, publicKeySign, privateKeySign, finalizeUrl, dnsNames, acmeDirectory) {
     try {
@@ -286,7 +286,7 @@ export async function finalizeOrder(commonName, kid, nonce, privateKey, publicKe
  * @property {Object} [answer.get] - The retrieved resource details
  * @property {string} [answer.location] - The location URL of the resource
  * @property {Object} [answer.error] - Error details if retrieval fails
- * @property {string} [nonce] - A new replay nonce for subsequent requests
+ * @property {string} nonce - A new replay nonce for subsequent requests
  */
 export async function postAsGet(kid, nonce, privateKey, url, acmeDirectory) {
     try {
@@ -336,7 +336,7 @@ export async function postAsGet(kid, nonce, privateKey, url, acmeDirectory) {
  * @property {Object} [answer.get] - The retrieved challenge details
  * @property {string} [answer.location] - The location URL of the challenge
  * @property {Object} [answer.error] - Error details if retrieval fails
- * @property {string} [nonce] - A new replay nonce for subsequent requests
+ * @property {string} nonce - A new replay nonce for subsequent requests
  */
 export async function postAsGetChal(kid, nonce, privateKey, url, acmeDirectory) {
     try {
