@@ -76,7 +76,7 @@ export async function newNonce(newNonceUrl) {
             }
         }
 
-        if (nonceUrl === null) {
+        if (nonceUrl == undefined) {
             return { answer: errorTemplate("bac:failed:newNonce", "No acme directory found or newNonce is not available.", 777778) };
         }
 
