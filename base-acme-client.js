@@ -33,21 +33,24 @@ const REPLAY_NONCE = 'replay-nonce';
  * @param {string} mainDirectoryUrl - The URL of the ACME server's directory endpoint
  * @returns {Promise<Object>} An object containing the directory information or an error
  * @property {Object|null} answer.directory - The parsed directory JSON or null
- * @property {Error} [answer.exception] - An error object if the request fails
  * @property {Response} [answer.error] - The error response if the request was unsuccessful
  */
 export async function newDirectoryAsync(mainDirectoryUrl) {
     try {
         const response = await fetchAndRetryUntilOk(mainDirectoryUrl, { method: METHOD_GET });
 
-        if (response.ok) {
-            return await response.json().then((result) => { return { answer: { directory: result } } });
+        if (response) {
+            if (response.ok) {
+                return await response.json().then((result) => { return { answer: { directory: result } } });
+            }
+            else {
+                return { answer: { error: response } };
+            }
         }
-        else {
-            return { answer: { error: response } };
-        }
+
+        return returnErrorTemplate("newDirectoryAsync");
     } catch (exception) {
-        return { answer: { exception: exception } }
+        return returnErrorTemplate("newDirectoryAsync", exception);
     }
 }
 
@@ -61,7 +64,6 @@ export async function newDirectoryAsync(mainDirectoryUrl) {
  * @property {string} [nonce] - The replay nonce retrieved from the server
  * @property {Object} answer - Contains response or error information
  * @property {Response} [answer.response] - The successful response
- * @property {Error} [answer.exception] - An error object if the request fails
  * @property {Response} [answer.error] - The error response if the request was unsuccessful
  */
 export async function newNonceAsync(newNonceUrl) {
@@ -75,20 +77,24 @@ export async function newNonceAsync(newNonceUrl) {
             }
         }
 
-        if (nonceUrl !== null) {
-            const response = await fetchAndRetryUntilOk(nonceUrl, { method: METHOD_HEAD });
+        if (nonceUrl === null) {
+            return { answer: { error: "No directories found or newNonce is not available." } };
+        }
 
+        const response = await fetchAndRetryUntilOk(nonceUrl, { method: METHOD_HEAD });
+
+        if (response) {
             if (response.ok) {
                 return { answer: { response: response }, nonce: response.headers.get(REPLAY_NONCE) };
             }
             else {
                 return { answer: { error: response } };
             }
-        } else {
-            return { answer: { error: "No directories found or newNonce is not available." } };
         }
+
+        return returnErrorTemplate("newNonceAsync");
     } catch (exception) {
-        return { answer: { exception: exception } }
+        return returnErrorTemplate("newNonceAsync", exception);
     }
 }
 
@@ -121,7 +127,6 @@ export async function createJsonWebKey(publicKey) {
  * @property {Object} [answer.account] - The created account details
  * @property {string} [answer.location] - The location URL of the created account
  * @property {Object} [answer.error] - Error details if account creation fails
- * @property {Error} [answer.exception] - An error object if an exception occurs
  * @property {string} [nonce] - A new replay nonce for subsequent requests
  */
 export async function createAccount(nonce, privateKey, jsonWebKey, acmeDirectory) {
@@ -137,20 +142,24 @@ export async function createAccount(nonce, privateKey, jsonWebKey, acmeDirectory
 
         const response = await fetchAndRetryProtectedUntilOk(payload, protectedHeader, privateKey, acmeDirectory);
 
-        if (response.ok) {
-            return {
-                answer: { account: await response.json(), location: response.headers.get(NEXT_URL) },
-                nonce: response.headers.get(REPLAY_NONCE)
-            };
+        if (response) {
+            if (response.ok) {
+                return {
+                    answer: { account: await response.json(), location: response.headers.get(NEXT_URL) },
+                    nonce: response.headers.get(REPLAY_NONCE)
+                };
+            }
+            else {
+                return {
+                    answer: { error: await response.json() },
+                    nonce: null
+                };
+            }
         }
-        else {
-            return {
-                answer: { error: await response.json() },
-                nonce: null
-            };
-        }
+
+        return returnErrorTemplate("createAccount");
     } catch (exception) {
-        return { answer: { exception: exception } }
+        return returnErrorTemplate("createAccount", exception);
     }
 }
 
@@ -168,7 +177,6 @@ export async function createAccount(nonce, privateKey, jsonWebKey, acmeDirectory
  * @property {Object} [answer.order] - The created order details
  * @property {string} [answer.location] - The location URL of the created order
  * @property {Object} [answer.error] - Error details if order creation fails
- * @property {Error} [answer.exception] - An error object if an exception occurs
  * @property {string} [nonce] - A new replay nonce for subsequent requests
  */
 export async function createOrder(kid, nonce, privateKey, identifiers, acmeDirectory) {
@@ -184,20 +192,24 @@ export async function createOrder(kid, nonce, privateKey, identifiers, acmeDirec
 
         const response = await fetchAndRetryProtectedUntilOk(payload, protectedHeader, privateKey, acmeDirectory);
 
-        if (response.ok) {
-            return {
-                answer: { order: await response.json(), location: response.headers.get(NEXT_URL) },
-                nonce: response.headers.get(REPLAY_NONCE)
-            };
+        if (response) {
+            if (response.ok) {
+                return {
+                    answer: { order: await response.json(), location: response.headers.get(NEXT_URL) },
+                    nonce: response.headers.get(REPLAY_NONCE)
+                };
+            }
+            else {
+                return {
+                    answer: { error: await response.json() },
+                    nonce: null
+                };
+            }
         }
-        else {
-            return {
-                answer: { error: await response.json() },
-                nonce: null
-            };
-        }
+
+        return returnErrorTemplate("createOrder");
     } catch (exception) {
-        return { answer: { exception: exception } }
+        return returnErrorTemplate("createOrder", exception);
     }
 }
 
@@ -219,7 +231,6 @@ export async function createOrder(kid, nonce, privateKey, identifiers, acmeDirec
  * @property {Object} [answer.get] - The finalized order details
  * @property {string} [answer.location] - The location URL of the finalized order
  * @property {Object} [answer.error] - Error details if finalization fails
- * @property {Error} [answer.exception] - An error object if an exception occurs
  * @property {string} [nonce] - A new replay nonce for subsequent requests
  */
 export async function finalizeOrder(commonName, kid, nonce, privateKey, publicKeySign, privateKeySign, finalizeUrl, dnsNames, acmeDirectory) {
@@ -235,20 +246,24 @@ export async function finalizeOrder(commonName, kid, nonce, privateKey, publicKe
 
         const response = await fetchAndRetryProtectedUntilOk(payload, protectedHeader, privateKey, acmeDirectory);
 
-        if (response.ok) {
-            return {
-                answer: { get: await response.json(), location: response.headers.get(NEXT_URL) },
-                nonce: response.headers.get(REPLAY_NONCE)
-            };
+        if (response) {
+            if (response.ok) {
+                return {
+                    answer: { get: await response.json(), location: response.headers.get(NEXT_URL) },
+                    nonce: response.headers.get(REPLAY_NONCE)
+                };
+            }
+            else {
+                return {
+                    answer: { error: await response.json() },
+                    nonce: response.headers.get(REPLAY_NONCE)
+                };
+            }
         }
-        else {
-            return {
-                answer: { error: await response.json() },
-                nonce: response.headers.get(REPLAY_NONCE)
-            };
-        }
+
+        return returnErrorTemplate("finalizeOrder");
     } catch (exception) {
-        return { answer: { exception: exception } }
+        return returnErrorTemplate("finalizeOrder", exception);
     }
 }
 
@@ -266,7 +281,6 @@ export async function finalizeOrder(commonName, kid, nonce, privateKey, publicKe
  * @property {Object} [answer.get] - The retrieved resource details
  * @property {string} [answer.location] - The location URL of the resource
  * @property {Object} [answer.error] - Error details if retrieval fails
- * @property {Error} [answer.exception] - An error object if an exception occurs
  * @property {string} [nonce] - A new replay nonce for subsequent requests
  */
 export async function postAsGet(kid, nonce, privateKey, url, acmeDirectory) {
@@ -280,22 +294,26 @@ export async function postAsGet(kid, nonce, privateKey, url, acmeDirectory) {
 
         const response = await fetchAndRetryProtectedUntilOk(METHOD_POST_AS_GET, protectedHeader, privateKey, acmeDirectory);
 
-        if (response.ok) {
-            return {
-                answer: { get: await response.json(), location: response.headers.get(NEXT_URL) },
-                nonce: response.headers.get(REPLAY_NONCE)
-            };
-        }
-        else {
-            const nextNonce = await newNonceAsync(acmeDirectory.newNonce);
+        if (response) {
+            if (response.ok) {
+                return {
+                    answer: { get: await response.json(), location: response.headers.get(NEXT_URL) },
+                    nonce: response.headers.get(REPLAY_NONCE)
+                };
+            }
+            else {
+                const nextNonce = await newNonceAsync(acmeDirectory.newNonce);
 
-            return {
-                answer: { error: await response.json() },
-                nonce: nextNonce.nonce ? nextNonce.nonce : null
-            };
+                return {
+                    answer: { error: await response.json() },
+                    nonce: nextNonce.nonce ? nextNonce.nonce : null
+                };
+            }
         }
+
+        return returnErrorTemplate("postAsGet");
     } catch (exception) {
-        return { answer: { exception: exception } }
+        return returnErrorTemplate("postAsGet", exception);
     }
 }
 
@@ -313,7 +331,6 @@ export async function postAsGet(kid, nonce, privateKey, url, acmeDirectory) {
  * @property {Object} [answer.get] - The retrieved challenge details
  * @property {string} [answer.location] - The location URL of the challenge
  * @property {Object} [answer.error] - Error details if retrieval fails
- * @property {Error} [answer.exception] - An error object if an exception occurs
  * @property {string} [nonce] - A new replay nonce for subsequent requests
  */
 export async function postAsGetChal(kid, nonce, privateKey, url, acmeDirectory) {
@@ -327,22 +344,26 @@ export async function postAsGetChal(kid, nonce, privateKey, url, acmeDirectory) 
 
         const response = await fetchAndRetryProtectedUntilOk(METHOD_POST_AS_GET_CHALLENGE, protectedHeader, privateKey, acmeDirectory);
 
-        if (response.ok) {
-            return {
-                answer: { get: await response.json(), location: response.headers.get(NEXT_URL) },
-                nonce: response.headers.get(REPLAY_NONCE)
-            };
-        }
-        else {
-            const nextNonce = await newNonceAsync(acmeDirectory.newNonce);
+        if (response) {
+            if (response.ok) {
+                return {
+                    answer: { get: await response.json(), location: response.headers.get(NEXT_URL) },
+                    nonce: response.headers.get(REPLAY_NONCE)
+                };
+            }
+            else {
+                const nextNonce = await newNonceAsync(acmeDirectory.newNonce);
 
-            return {
-                answer: { error: await response.json() },
-                nonce: nextNonce.nonce ? nextNonce.nonce : null
-            };
+                return {
+                    answer: { error: await response.json() },
+                    nonce: nextNonce.nonce ? nextNonce.nonce : null
+                };
+            }
         }
+
+        return returnErrorTemplate("postAsGetChal");
     } catch (exception) {
-        return { answer: { exception: exception } }
+        return returnErrorTemplate("postAsGetChal", exception);
     }
 }
 
@@ -383,50 +404,6 @@ export async function signPayload(payload, protectedHeader, privateKey) {
     }
 
     return JSON.stringify(jws);
-}
-
-/**
- * Sends a signed request to the ACME server.
- * @async
- * @function fetchRequest
- * @param {string} method - The HTTP method to use (e.g., 'GET', 'POST')
- * @param {string} url - The URL to send the request to
- * @param {string} signedData - The signed payload to send
- * @returns {Promise<Response>} The response from the server
- */
-export async function fetchRequest(method, url, signedData) {
-    const request = {
-        method: method,
-        headers: {
-            [CONTENT_TYPE]: CONTENT_TYPE_JOSE
-        },
-        body: signedData
-    };
-
-    return await fetch(url, request);
-}
-
-/**
- * Fetches the suggested renewal window information for a certificate from the specified URL.
- * @async
- * @function fetchSuggestedWindow
- * @param {string} renewalInfoUrl - The base URL for fetching renewal information.
- * @param {string} aki- The Authority Key Identifier in hexadecimal format.
- * @param {string} serial - The serial number in hexadecimal format.
- * @returns {Promise<Object|undefined>} A promise that resolves to the parsed JSON
- * response if the request is successful, or `undefined` if the request fails.
- *
- * @throws {Error} Throws an error if the fetch operation fails.
- */
-export async function fetchSuggestedWindow(renewalInfoUrl, aki, serial) {
-    const url = `${renewalInfoUrl}/${base64urlEncode(hexToBytes(aki))}.${base64urlEncode(hexToBytes(serial))}`;
-
-    const response = await fetch(url);
-    if (response.ok) {
-        return await response.json()
-    }
-
-    return undefined;
 }
 
 /**
@@ -519,11 +496,11 @@ export async function fetchAndRetryUntilOk(fetchInput, init, attempts = 6) {
                 return response;
             }
 
-            console.log(a - 1, "attempt failed, trying again");
+            console.error(a - 1, "attempt failed, trying again", fetchInput);
 
             await new Promise((resolve) => setTimeout(() => { resolve(); }, 650 * a)); // Each failed attempt will delay itself slightly more
         } catch (exception) {
-            console.log(a - 1, exception);
+            console.error(a - 1, exception);
         }
     }
 
@@ -596,7 +573,7 @@ export async function fetchAndRetryProtectedUntilOk(payload, protectedHeader, pr
 
             protectedHeader.nonce = undefined;
 
-            console.log(a - 1, "attempt failed, trying again");
+            console.log(a - 1, "attempt failed, trying again", protectedHeader);
 
             await new Promise((resolve) => setTimeout(() => { resolve(); }, 2250 * a)); // Each failed attempt will delay itself slightly more
         } catch (exception) {
@@ -605,4 +582,64 @@ export async function fetchAndRetryProtectedUntilOk(payload, protectedHeader, pr
     }
 
     return undefined;
+}
+
+/**
+ * Sends a signed request to the ACME server.
+ * @async
+ * @function fetchRequest
+ * @param {string} method - The HTTP method to use (e.g., 'GET', 'POST')
+ * @param {string} url - The URL to send the request to
+ * @param {string} signedData - The signed payload to send
+ * @returns {Promise<Response>} The response from the server
+ */
+export async function fetchRequest(method, url, signedData) {
+    const request = {
+        method: method,
+        headers: {
+            [CONTENT_TYPE]: CONTENT_TYPE_JOSE
+        },
+        body: signedData
+    };
+
+    return await fetch(url, request);
+}
+
+/**
+ * Fetches the suggested renewal window information for a certificate from the specified URL.
+ * @async
+ * @function fetchSuggestedWindow
+ * @param {string} renewalInfoUrl - The base URL for fetching renewal information.
+ * @param {string} aki- The Authority Key Identifier in hexadecimal format.
+ * @param {string} serial - The serial number in hexadecimal format.
+ * @returns {Promise<Object|undefined>} A promise that resolves to the parsed JSON
+ * response if the request is successful, or `undefined` if the request fails.
+ *
+ * @throws {Error} Throws an error if the fetch operation fails.
+ */
+export async function fetchSuggestedWindow(renewalInfoUrl, aki, serial) {
+    const url = `${renewalInfoUrl}/${base64urlEncode(hexToBytes(aki))}.${base64urlEncode(hexToBytes(serial))}`;
+
+    const response = await fetchAndRetryUntilOk(url);
+    if (response.ok) {
+        return await response.json()
+    }
+
+    return undefined;
+}
+
+function returnErrorTemplate(error, exception) {
+    return {
+        answer: {
+            error: !exception ? {
+                type: `bac:failed:${error}`,
+                detail: `Could not complete ${error} after multiple attempts`,
+                status: 777777
+            } : {
+                type: `bac:exception:${error}`,
+                detail: exception,
+                status: 777777
+            }
+        }
+    }
 }
