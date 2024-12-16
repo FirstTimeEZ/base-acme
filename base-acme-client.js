@@ -612,20 +612,30 @@ export async function fetchRequest(method, url, signedData) {
  * @param {string} renewalInfoUrl - The base URL for fetching renewal information.
  * @param {string} aki- The Authority Key Identifier in hexadecimal format.
  * @param {string} serial - The serial number in hexadecimal format.
- * @returns {Promise<Object|undefined>} A promise that resolves to the parsed JSON
- * response if the request is successful, or `undefined` if the request fails.
- *
+ * 
+ * @returns {Promise<Object>} A promise that resolves to the parsed JSON of the suggested window
+ * @property {Object} answer - Contains suggested window or error information
+ * @property {Object} [answer.get] - The retrieved suggested window
+ * @property {Object} [answer.error] - Error details if retrieval fails
+ * 
  * @throws {Error} Throws an error if the fetch operation fails.
  */
 export async function fetchSuggestedWindow(renewalInfoUrl, aki, serial) {
-    const url = `${renewalInfoUrl}/${base64urlEncode(hexToBytes(aki))}.${base64urlEncode(hexToBytes(serial))}`;
+    try {
+        const url = `${renewalInfoUrl}/${base64urlEncode(hexToBytes(aki))}.${base64urlEncode(hexToBytes(serial))}`;
 
-    const response = await fetchAndRetryUntilOk(url);
-    if (response.ok) {
-        return await response.json()
+        const response = await fetchAndRetryUntilOk(url);
+
+        if (response) {
+            if (response.ok) {
+                return { answer: { get: await response.json() } }
+            }
+        }
+
+        return returnErrorTemplate("fetchSuggestedWindow");
+    } catch (exception) {
+        return returnErrorTemplate("fetchSuggestedWindow", exception);
     }
-
-    return undefined;
 }
 
 function returnErrorTemplate(error, exception) {
