@@ -499,15 +499,17 @@ Errors and Exceptions will be returned in an object
 ```
 // Exceptions
 {
-    answer: {
-      error: {
-        type: 'bac:exception:methodName',
-        detail: Error: methodName
-            at file:///base-acme/test/testing.js:11:47
-            at process.processTicksAndRejections (node:internal/process/task_queues:105:5),
-        status: 777777
-      }
+  answer: {
+    error: {
+      type: 'bac:exception:methodName',
+      detail: Error: SyntaxError: Unexpected end of input
+          at file:///base-acme-client.js:666:11
+          at ModuleJob.run (node:internal/modules/esm/module_job:271:25)
+          at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:547:26)
+          at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:116:5),
+      status: 777777
     }
+  }
 }
 
 // Errors
