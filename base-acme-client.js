@@ -40,7 +40,7 @@ export async function newDirectory(mainDirectoryUrl) {
         const response = await fetchAndRetryUntilOk(mainDirectoryUrl, { method: METHOD_GET });
 
         if (response) {
-            return { answer: response.ok ? { directory: await response.json() } : { error: await response.json() } };
+            return { answer: { [response.ok ? 'directory' : 'error']: await response.json() } };
         }
 
         return notCompletedError("newDirectory");
