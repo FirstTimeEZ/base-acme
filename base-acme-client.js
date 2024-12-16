@@ -120,18 +120,7 @@ export async function createAccount(nonce, privateKey, jsonWebKey, acmeDirectory
         const response = await fetchAndRetryProtectedUntilOk(payload, protectedHeader, privateKey, acmeDirectory);
 
         if (response) {
-            if (response.ok) {
-                return {
-                    answer: { account: await response.json(), location: response.headers.get(NEXT_URL) },
-                    nonce: response.headers.get(REPLAY_NONCE)
-                };
-            }
-            else {
-                return {
-                    answer: { error: await response.json() },
-                    nonce: await getNextNonce(response.headers, acmeDirectory)
-                };
-            }
+            return await returnAnswer(response, acmeDirectory, 'account');
         }
 
         return notCompletedError("createAccount");
@@ -171,18 +160,7 @@ export async function createOrder(kid, nonce, privateKey, identifiers, acmeDirec
         const response = await fetchAndRetryProtectedUntilOk(payload, protectedHeader, privateKey, acmeDirectory);
 
         if (response) {
-            if (response.ok) {
-                return {
-                    answer: { order: await response.json(), location: response.headers.get(NEXT_URL) },
-                    nonce: response.headers.get(REPLAY_NONCE)
-                };
-            }
-            else {
-                return {
-                    answer: { error: await response.json() },
-                    nonce: await getNextNonce(response.headers, acmeDirectory)
-                };
-            }
+            return returnAnswer(response, acmeDirectory, 'order');
         }
 
         return notCompletedError("createOrder");
@@ -226,18 +204,7 @@ export async function finalizeOrder(commonName, kid, nonce, privateKey, publicKe
         const response = await fetchAndRetryProtectedUntilOk(payload, protectedHeader, privateKey, acmeDirectory);
 
         if (response) {
-            if (response.ok) {
-                return {
-                    answer: { get: await response.json(), location: response.headers.get(NEXT_URL) },
-                    nonce: response.headers.get(REPLAY_NONCE)
-                };
-            }
-            else {
-                return {
-                    answer: { error: await response.json() },
-                    nonce: await getNextNonce(response.headers, acmeDirectory)
-                };
-            }
+            return returnAnswer(response, acmeDirectory, 'get');
         }
 
         return notCompletedError("finalizeOrder");
@@ -275,18 +242,7 @@ export async function postAsGet(kid, nonce, privateKey, url, acmeDirectory) {
         const response = await fetchAndRetryProtectedUntilOk(METHOD_POST_AS_GET, protectedHeader, privateKey, acmeDirectory);
 
         if (response) {
-            if (response.ok) {
-                return {
-                    answer: { get: await response.json(), location: response.headers.get(NEXT_URL) },
-                    nonce: response.headers.get(REPLAY_NONCE)
-                };
-            }
-            else {
-                return {
-                    answer: { error: await response.json() },
-                    nonce: await getNextNonce(response.headers, acmeDirectory)
-                };
-            }
+            return returnAnswer(response, acmeDirectory, 'get');
         }
 
         return notCompletedError("postAsGet");
@@ -324,18 +280,7 @@ export async function postAsGetChal(kid, nonce, privateKey, url, acmeDirectory) 
         const response = await fetchAndRetryProtectedUntilOk(METHOD_POST_AS_GET_CHALLENGE, protectedHeader, privateKey, acmeDirectory);
 
         if (response) {
-            if (response.ok) {
-                return {
-                    answer: { get: await response.json(), location: response.headers.get(NEXT_URL) },
-                    nonce: response.headers.get(REPLAY_NONCE)
-                };
-            }
-            else {
-                return {
-                    answer: { error: await response.json() },
-                    nonce: await getNextNonce(response.headers, acmeDirectory)
-                };
-            }
+            return returnAnswer(response, acmeDirectory, 'get');
         }
 
         return notCompletedError("postAsGetChal");
@@ -506,7 +451,7 @@ export async function fetchSuggestedWindow(renewalInfoUrl, aki, serial) {
     try {
         const url = `${renewalInfoUrl}/${base64urlEncode(hexToBytes(aki))}.${base64urlEncode(hexToBytes(serial))}`;
 
-        const response = await fetchAndRetryUntilOk(url);
+        const response = await fetchAndRetryUntilOk(url, null, 2, true);
 
         if (response && response.ok) {
             return { answer: { get: await response.json() } }
@@ -525,7 +470,7 @@ export async function fetchSuggestedWindow(renewalInfoUrl, aki, serial) {
  * @param {string|Request} fetchInput - The URL or Request object to fetch
  * @param {Object} init - optional fetch init object
  * @param {number} [attempts=6] - Maximum number of fetch attempts
- * 
+ * @param {boolean} silent - true to suppress console output on failure attempt
  * @returns {Promise<Response|undefined>} The response or undefined if all attempts fail
  * 
  * @description
@@ -544,7 +489,7 @@ export async function fetchSuggestedWindow(renewalInfoUrl, aki, serial) {
  *   // Process successful response
  * }
  */
-export async function fetchAndRetryUntilOk(fetchInput, init, attempts = 6) {
+export async function fetchAndRetryUntilOk(fetchInput, init, attempts = 6, silent = false) {
     let a = 1;
 
     while (a <= attempts) {
@@ -560,7 +505,9 @@ export async function fetchAndRetryUntilOk(fetchInput, init, attempts = 6) {
                 return response;
             }
 
-            console.error(a - 1, "attempt failed, trying again", fetchInput);
+            if (!silent) {
+                console.error(a - 1, "attempt failed, trying again", fetchInput);
+            }
 
             await new Promise((resolve) => setTimeout(() => { resolve(); }, 650 * a)); // Each failed attempt will delay itself slightly more
         } catch (exception) {
@@ -648,6 +595,13 @@ export async function fetchAndRetryProtectedUntilOk(payload, protectedHeader, pr
     }
 
     return undefined;
+}
+
+async function returnAnswer(response, acmeDirectory, name) {
+    return {
+        answer: { [response.ok ? name : 'error']: await response.json(), location: response.headers.get(NEXT_URL) },
+        nonce: await getNextNonce(response.headers, acmeDirectory)
+    };
 }
 
 function notCompletedError(error, exception) {

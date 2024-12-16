@@ -485,6 +485,7 @@ Fetch a resource with multiple retry attempts and progressive backoff.
  * @param {string|Request} fetchInput - The URL or Request object to fetch
  * @param {Object} init - optional fetch init object
  * @param {number} [attempts=6] - Maximum number of fetch attempts
+ * @param {boolean} silent - true to suppress console output on failure attempt
  * 
  * @returns {Promise<Response|undefined>} The response or undefined if all attempts fail
  * 
@@ -504,7 +505,7 @@ Fetch a resource with multiple retry attempts and progressive backoff.
  *   // Process successful response
  * }
  */
-export async function fetchAndRetryUntilOk(fetchInput, init, attempts = 6) { /*...*/ }
+export async function fetchAndRetryUntilOk(fetchInput, init, attempts = 6, silent = false) { /*...*/ }
 ```
 
 </details>
