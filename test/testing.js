@@ -8,6 +8,6 @@ const nonce = await bac.newNonce(directory.answer.directory.newNonce);
 
 console.log(nonce);
 
-const getNext = await bac.getNonce(null, directory.answer.directory);
+const getNext = await bac.getNextNonce(null, directory.answer.directory);
 
 console.log(getNext);

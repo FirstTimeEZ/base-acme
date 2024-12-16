@@ -386,6 +386,35 @@ export function hexToBytes(hex) { /*...*/ }
 
 ------------
 
+### getNextNonce
+
+Retrieves the next nonce for ACME protocol requests.
+
+<details>
+<summary><b>Show jsdoc</b></summary>
+
+```javascript
+/**
+ * Retrieves the next nonce for ACME protocol requests.
+ *
+ * If a replay nonce is provided in the headers, it will return that nonce.
+ * Otherwise, it will request a new nonce from the ACME directory.
+ *
+ * @async
+ * 
+ * @param {Headers} headers - The headers object containing the replay nonce.
+ * @param {Object} acmeDirectory - The ACME directory containing URLs for ACME operations
+ * 
+ * @returns {Promise<string|null>} A promise that resolves to the next nonce as a string,
+ *                                  or null if no nonce is available.
+ */
+export async function getNextNonce(headers, acmeDirectory) { /*...*/ }
+```
+
+</details>
+
+------------
+
 ### fetchRequest
 
 Sends a signed request to the `ACME` server.

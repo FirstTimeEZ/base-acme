@@ -153,7 +153,7 @@ export async function createAccount(nonce, privateKey, jsonWebKey, acmeDirectory
             else {
                 return {
                     answer: { error: await response.json() },
-                    nonce: await getNonce(response.headers, acmeDirectory)
+                    nonce: await getNextNonce(response.headers, acmeDirectory)
                 };
             }
         }
@@ -204,7 +204,7 @@ export async function createOrder(kid, nonce, privateKey, identifiers, acmeDirec
             else {
                 return {
                     answer: { error: await response.json() },
-                    nonce: await getNonce(response.headers, acmeDirectory)
+                    nonce: await getNextNonce(response.headers, acmeDirectory)
                 };
             }
         }
@@ -259,7 +259,7 @@ export async function finalizeOrder(commonName, kid, nonce, privateKey, publicKe
             else {
                 return {
                     answer: { error: await response.json() },
-                    nonce: await getNonce(response.headers, acmeDirectory)
+                    nonce: await getNextNonce(response.headers, acmeDirectory)
                 };
             }
         }
@@ -308,7 +308,7 @@ export async function postAsGet(kid, nonce, privateKey, url, acmeDirectory) {
             else {
                 return {
                     answer: { error: await response.json() },
-                    nonce: await getNonce(response.headers, acmeDirectory)
+                    nonce: await getNextNonce(response.headers, acmeDirectory)
                 };
             }
         }
@@ -357,7 +357,7 @@ export async function postAsGetChal(kid, nonce, privateKey, url, acmeDirectory) 
             else {
                 return {
                     answer: { error: await response.json() },
-                    nonce: await getNonce(response.headers, acmeDirectory)
+                    nonce: await getNextNonce(response.headers, acmeDirectory)
                 };
             }
         }
@@ -461,6 +461,32 @@ export function hexToBytes(hex) {
         bytes[i / 2] = parseInt(hex.substring(i, i + 2), 16);
     }
     return bytes;
+}
+
+/**
+ * Retrieves the next nonce for ACME protocol requests.
+ *
+ * If a replay nonce is provided in the headers, it will return that nonce.
+ * Otherwise, it will request a new nonce from the ACME directory.
+ *
+ * @async
+ * 
+ * @param {Headers} headers - The headers object containing the replay nonce.
+ * @param {Object} acmeDirectory - The ACME directory containing URLs for ACME operations
+ * 
+ * @returns {Promise<string|null>} A promise that resolves to the next nonce as a string,
+ *                                  or null if no nonce is available.
+ */
+export async function getNextNonce(headers, acmeDirectory) {
+    const replay = headers ? headers.get(REPLAY_NONCE) : undefined;
+
+    if (replay == undefined) {
+        const nextNonce = await newNonce(acmeDirectory.newNonce);
+
+        return nextNonce.nonce ? nextNonce.nonce : null;
+    }
+
+    return replay;
 }
 
 /**
@@ -646,18 +672,6 @@ export async function fetchAndRetryProtectedUntilOk(payload, protectedHeader, pr
     }
 
     return undefined;
-}
-
-async function getNonce(headers, acmeDirectory) {
-    const replay = headers ? headers.get(REPLAY_NONCE) : undefined;
-
-    if (replay == undefined) {
-        const nextNonce = await newNonce(acmeDirectory.newNonce);
-
-        return nextNonce.nonce ? nextNonce.nonce : null;
-    }
-
-    return replay;
 }
 
 function notCompletedError(error, exception) {
