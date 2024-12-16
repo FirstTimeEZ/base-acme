@@ -10,11 +10,10 @@ import { createPrivateKey, createPublicKey, createHash, sign } from 'crypto';
 import { generateCSRWithExistingKeys } from 'simple-csr-generator';
 
 const CONTENT_TYPE = "Content-Type";
+const CONTENT_TYPE_JOSE = 'application/jose+json';
 
 const DIGEST = "sha256";
 const ALG_ECDSA = 'ES256';
-
-const CONTENT_TYPE_JOSE = 'application/jose+json';
 
 const METHOD_GET = "GET";
 const METHOD_POST = "POST";
@@ -41,12 +40,7 @@ export async function newDirectory(mainDirectoryUrl) {
         const response = await fetchAndRetryUntilOk(mainDirectoryUrl, { method: METHOD_GET });
 
         if (response) {
-            if (response.ok) {
-                return { answer: { directory: await response.json() } };
-            }
-            else {
-                return { answer: { error: await response.json() } };
-            }
+            return { answer: response.ok ? { directory: await response.json() } : { error: await response.json() } };
         }
 
         return notCompletedError("newDirectory");
@@ -70,12 +64,7 @@ export async function newNonce(newNonceUrl) {
         const response = await fetchAndRetryUntilOk(newNonceUrl, { method: METHOD_HEAD });
 
         if (response) {
-            if (response.ok) {
-                return { answer: null, nonce: response.headers.get(REPLAY_NONCE) };
-            }
-            else {
-                return { answer: { error: await response.json() } };
-            }
+            return response.ok ? { answer: null, nonce: response.headers.get(REPLAY_NONCE) } : { answer: { error: await response.json() } };
         }
 
         return notCompletedError("newNonce");
