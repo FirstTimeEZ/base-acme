@@ -15,14 +15,14 @@ Fetches the directory information from an ACME server.
 /**
  * Fetches the directory information from an ACME server.
  * @async
- * @function newDirectoryAsync
+ * 
  * @param {string} mainDirectoryUrl - The URL of the ACME server's directory endpoint
  * 
  * @returns {Promise<Object>} An object containing the directory information or an error
  * @property {Object|null} answer.directory - The parsed directory JSON or null
  * @property {Response} [answer.error] - The error response if the request was unsuccessful
  */
-export async function newDirectoryAsync(mainDirectoryUrl) { /*...*/ }
+export async function newDirectory(mainDirectoryUrl) { /*...*/ }
 ```
 
 </details>
@@ -38,14 +38,14 @@ Retrieves a new nonce from the ACME server.
 /**
  * Retrieves a new nonce from the ACME server.
  * @async
- * @function newNonceAsync
+ * 
  * @param {string} [newNonceUrl] - Optional URL to fetch a new nonce. If not provided, it will be retrieved from the directory.
  * 
  * @returns {Promise<Object>} An object containing the nonce or error details
  * @property {string} nonce - A new replay nonce for subsequent requests
  * @property {Object} [answer.error] - The error response if the request was unsuccessful
  */
-export async function newNonceAsync(newNonceUrl) { /*...*/ }
+export async function newNonce(newNonceUrl) { /*...*/ }
 ```
 
 </details>
@@ -61,7 +61,7 @@ Creates a JSON Web Key (JWK) from a public key.
 /**
  * Creates a JSON Web Key (JWK) from a public key.
  * @async
- * @function createJsonWebKey
+ * 
  * @param {Object} publicKey - The public key to convert to JWK format
  * 
  * @returns {Promise<Object>} An object containing the JWK and its thumbprint
@@ -84,7 +84,7 @@ Creates a new account on the ACME server.
 /**
  * Creates a new account on the ACME server.
  * @async
- * @function createAccount
+ * 
  * @param {string} nonce - The replay nonce from the server
  * @param {string} newAccountUrl - The URL for creating a new account
  * @param {Object} privateKey - The private key for signing the request
@@ -114,7 +114,7 @@ Creates a new order for certificate issuance on the ACME server.
 /**
  * Creates a new order for certificate issuance on the ACME server.
  * @async
- * @function createOrder
+ * 
  * @param {string} kid - Key Identifier for the account
  * @param {string} nonce - The replay nonce from the server
  * @param {Object} privateKey - The private key for signing the request
@@ -144,7 +144,7 @@ Finalizes a certificate order by submitting a Certificate Signing Request (CSR).
 /**
  * Finalizes a certificate order by submitting a Certificate Signing Request (CSR).
  * @async
- * @function finalizeOrder
+ * 
  * @param {string} commonName - The primary domain name for the certificate
  * @param {string} kid - Key Identifier for the account
  * @param {string} nonce - The replay nonce from the server
@@ -178,7 +178,7 @@ Performs a POST-as-GET request to retrieve order or authorization status.
 /**
  * Performs a POST-as-GET request to retrieve order or authorization status.
  * @async
- * @function postAsGet
+ * 
  * @param {string} kid - Key Identifier for the account
  * @param {string} nonce - The replay nonce from the server
  * @param {Object} privateKey - The private key for signing the request
@@ -208,7 +208,7 @@ Performs a POST-as-GET request for challenges
 /**
  * Performs a POST-as-GET request for challenges
  * @async
- * @function postAsGetChal
+ * 
  * @param {string} kid - Key Identifier for the account
  * @param {string} nonce - The replay nonce from the server
  * @param {Object} privateKey - The private key for signing the request
@@ -238,7 +238,7 @@ Signs a JSON payload for ACME server requests.
 /**
  * Signs a JSON payload for ACME server requests.
  * @async
- * @function signPayloadJson
+ * 
  * @param {Object} payload - The payload to be signed
  * @param {Object} protectedHeader - The protected header containing metadata
  * @param {Object} privateKey - The private key used for signing
@@ -261,7 +261,7 @@ Signs a payload for ACME server requests.
 /**
  * Signs a payload for ACME server requests.
  * @async
- * @function signPayload
+ * 
  * @param {string|Object} payload - The payload to be signed
  * @param {Object} protectedHeader - The protected header containing metadata
  * @param {Object} privateKey - The private key used for signing
@@ -283,7 +283,7 @@ Formats a PEM-encoded public key to a key object.
 ```javascript
 /**
  * Formats a PEM-encoded public key to a key object.
- * @function formatPublicKey
+ * 
  * @param {string} pem - The PEM-encoded public key
  * 
  * @returns {Object} A formatted public key object
@@ -303,7 +303,7 @@ Formats a PEM-encoded private key to a key object.
 ```javascript
 /**
  * Formats a PEM-encoded private key to a key object.
- * @function formatPrivateKey
+ * 
  * @param {string} pem - The PEM-encoded private key
  * 
  * @returns {Object} A formatted private key object
@@ -323,7 +323,7 @@ Encodes input to a base64url-encoded string.
 ```javascript
 /**
  * Encodes input to a base64url-encoded string.
- * @function base64urlEncode
+ *
  * @param {string|Uint8Array} input - The input to encode
  * 
  * @returns {string} A base64url-encoded string
@@ -343,7 +343,7 @@ Converts a hexadecimal string to a Uint8Array of bytes.
 ```javascript
 /**
  * Converts a hexadecimal string to a Uint8Array of bytes.
- * @function hexToBytes
+ * 
  * @param {string} hex - The hexadecimal string to convert. It should contain an even number of characters.
  * 
  * @returns {Uint8Array} A Uint8Array containing the byte values represented by the hexadecimal string.
@@ -365,7 +365,7 @@ Sends a signed request to the ACME server.
 /**
  * Sends a signed request to the ACME server.
  * @async
- * @function fetchRequest
+ * 
  * @param {string} method - The HTTP method to use (e.g., 'GET', 'POST')
  * @param {string} url - The URL to send the request to
  * @param {string} signedData - The signed payload to send
@@ -388,7 +388,7 @@ Fetches the suggested renewal window information for a certificate from the spec
 /**
  * Fetches the suggested renewal window information for a certificate from the specified URL.
  * @async
- * @function fetchSuggestedWindow
+ * 
  * @param {string} renewalInfoUrl - The base URL for fetching renewal information.
  * @param {string} aki- The Authority Key Identifier in hexadecimal format.
  * @param {string} serial - The serial number in hexadecimal format.
@@ -415,6 +415,7 @@ Fetch a resource with multiple retry attempts and progressive backoff.
 ```javascript
 /**
  * Fetch a resource with multiple retry attempts and progressive backoff.
+ * @async
  * 
  * @param {string|Request} fetchInput - The URL or Request object to fetch
  * @param {Object} init - optional fetch init object
@@ -453,6 +454,7 @@ Fetch a protected resource with multiple retry attempts and progressive backoff.
 ```javascript
 /**
  * Fetch a protected resource with multiple retry attempts and progressive backoff.
+ * @async
  *
  * @param {Object} payload - The payload to be sent with the request
  * @param {Object} protectedHeader - The protected header containing metadata for the request
