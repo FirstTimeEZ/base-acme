@@ -129,7 +129,7 @@ export async function createJsonWebKey(publicKey) {
  * @param {Object} acmeDirectory - The ACME directory containing URLs for ACME operations
  * @returns {Promise<Object>} An object containing the account creation result
  * @property {Object} answer - Contains account details or error information
- * @property {Object} [answer.account] - The created account details
+ * @property {Object|null} [answer.account] - The created account details
  * @property {string} [answer.location] - The location URL of the created account
  * @property {Object} [answer.error] - Error details if account creation fails
  * @property {string} nonce - A new replay nonce for subsequent requests
@@ -179,7 +179,7 @@ export async function createAccount(nonce, privateKey, jsonWebKey, acmeDirectory
  * @param {Object} acmeDirectory - The ACME directory containing URLs for ACME operations
  * @returns {Promise<Object>} An object containing the order creation result
  * @property {Object} answer - Contains order details or error information
- * @property {Object} [answer.order] - The created order details
+ * @property {Object|null} [answer.order] - The created order details
  * @property {string} [answer.location] - The location URL of the created order
  * @property {Object} [answer.error] - Error details if order creation fails
  * @property {string} nonce - A new replay nonce for subsequent requests
@@ -233,7 +233,7 @@ export async function createOrder(kid, nonce, privateKey, identifiers, acmeDirec
  * @param {string[]} dnsNames - Additional DNS names to be included in the certificate
  * @returns {Promise<Object>} An object containing the order finalization result
  * @property {Object} answer - Contains finalization details or error information
- * @property {Object} [answer.get] - The finalized order details
+ * @property {Object|null} [answer.get] - The finalized order details
  * @property {string} [answer.location] - The location URL of the finalized order
  * @property {Object} [answer.error] - Error details if finalization fails
  * @property {string} nonce - A new replay nonce for subsequent requests
@@ -283,7 +283,7 @@ export async function finalizeOrder(commonName, kid, nonce, privateKey, publicKe
  * @param {Object} acmeDirectory - The ACME directory containing URLs for ACME operations
  * @returns {Promise<Object>} An object containing the retrieved information
  * @property {Object} answer - Contains retrieved details or error information
- * @property {Object} [answer.get] - The retrieved resource details
+ * @property {Object|null} [answer.get] - The retrieved resource details
  * @property {string} [answer.location] - The location URL of the resource
  * @property {Object} [answer.error] - Error details if retrieval fails
  * @property {string} nonce - A new replay nonce for subsequent requests
@@ -333,7 +333,7 @@ export async function postAsGet(kid, nonce, privateKey, url, acmeDirectory) {
  * @param {Object} acmeDirectory - The ACME directory containing URLs for ACME operations
  * @returns {Promise<Object>} An object containing the challenge details
  * @property {Object} answer - Contains challenge details or error information
- * @property {Object} [answer.get] - The retrieved challenge details
+ * @property {Object|null} [answer.get] - The retrieved challenge details
  * @property {string} [answer.location] - The location URL of the challenge
  * @property {Object} [answer.error] - Error details if retrieval fails
  * @property {string} nonce - A new replay nonce for subsequent requests
