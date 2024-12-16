@@ -49,9 +49,9 @@ export async function newDirectory(mainDirectoryUrl) {
             }
         }
 
-        return returnErrorTemplate("newDirectory");
+        return notCompletedError("newDirectory");
     } catch (exception) {
-        return returnErrorTemplate("newDirectory", exception);
+        return notCompletedError("newDirectory", exception);
     }
 }
 
@@ -77,15 +77,7 @@ export async function newNonce(newNonceUrl) {
         }
 
         if (nonceUrl === null) {
-            return {
-                answer: {
-                    error: {
-                        type: `bac:failed:newNonce`,
-                        detail: `No acme directory found or newNonce is not available.`,
-                        status: 777778
-                    }
-                }
-            };
+            return { answer: errorTemplate("bac:failed:newNonce", "No acme directory found or newNonce is not available.", 777778) };
         }
 
         const response = await fetchAndRetryUntilOk(nonceUrl, { method: METHOD_HEAD });
@@ -99,9 +91,9 @@ export async function newNonce(newNonceUrl) {
             }
         }
 
-        return returnErrorTemplate("newNonce");
+        return notCompletedError("newNonce");
     } catch (exception) {
-        return returnErrorTemplate("newNonce", exception);
+        return notCompletedError("newNonce", exception);
     }
 }
 
@@ -166,9 +158,9 @@ export async function createAccount(nonce, privateKey, jsonWebKey, acmeDirectory
             }
         }
 
-        return returnErrorTemplate("createAccount");
+        return notCompletedError("createAccount");
     } catch (exception) {
-        return returnErrorTemplate("createAccount", exception);
+        return notCompletedError("createAccount", exception);
     }
 }
 
@@ -217,9 +209,9 @@ export async function createOrder(kid, nonce, privateKey, identifiers, acmeDirec
             }
         }
 
-        return returnErrorTemplate("createOrder");
+        return notCompletedError("createOrder");
     } catch (exception) {
-        return returnErrorTemplate("createOrder", exception);
+        return notCompletedError("createOrder", exception);
     }
 }
 
@@ -272,9 +264,9 @@ export async function finalizeOrder(commonName, kid, nonce, privateKey, publicKe
             }
         }
 
-        return returnErrorTemplate("finalizeOrder");
+        return notCompletedError("finalizeOrder");
     } catch (exception) {
-        return returnErrorTemplate("finalizeOrder", exception);
+        return notCompletedError("finalizeOrder", exception);
     }
 }
 
@@ -323,9 +315,9 @@ export async function postAsGet(kid, nonce, privateKey, url, acmeDirectory) {
             }
         }
 
-        return returnErrorTemplate("postAsGet");
+        return notCompletedError("postAsGet");
     } catch (exception) {
-        return returnErrorTemplate("postAsGet", exception);
+        return notCompletedError("postAsGet", exception);
     }
 }
 
@@ -374,9 +366,9 @@ export async function postAsGetChal(kid, nonce, privateKey, url, acmeDirectory) 
             }
         }
 
-        return returnErrorTemplate("postAsGetChal");
+        return notCompletedError("postAsGetChal");
     } catch (exception) {
-        return returnErrorTemplate("postAsGetChal", exception);
+        return notCompletedError("postAsGetChal", exception);
     }
 }
 
@@ -522,9 +514,9 @@ export async function fetchSuggestedWindow(renewalInfoUrl, aki, serial) {
             return { answer: { get: await response.json() } }
         }
 
-        return returnErrorTemplate("fetchSuggestedWindow");
+        return notCompletedError("fetchSuggestedWindow");
     } catch (exception) {
-        return returnErrorTemplate("fetchSuggestedWindow", exception);
+        return notCompletedError("fetchSuggestedWindow", exception);
     }
 }
 
@@ -660,18 +652,21 @@ export async function fetchAndRetryProtectedUntilOk(payload, protectedHeader, pr
     return undefined;
 }
 
-function returnErrorTemplate(error, exception) {
+function notCompletedError(error, exception) {
     return {
-        answer: {
-            error: !exception ? {
-                type: `bac:failed:${error}`,
-                detail: `Could not complete ${error} after multiple attempts`,
-                status: 777777
-            } : {
-                type: `bac:exception:${error}`,
-                detail: exception,
-                status: 777777
-            }
+        answer:
+            !exception
+                ? errorTemplate(`bac:failed:${error}`, `Could not complete ${error} after multiple attempts`, 777777)
+                : errorTemplate(`bac:exception:${error}`, exception, 777777)
+    }
+}
+
+function errorTemplate(type, details, status) {
+    return {
+        error: {
+            type: type,
+            detail: details,
+            status: status
         }
     }
 }
