@@ -518,10 +518,8 @@ export async function fetchSuggestedWindow(renewalInfoUrl, aki, serial) {
 
         const response = await fetchAndRetryUntilOk(url);
 
-        if (response) {
-            if (response.ok) {
-                return { answer: { get: await response.json() } }
-            }
+        if (response && response.ok) {
+            return { answer: { get: await response.json() } }
         }
 
         return returnErrorTemplate("fetchSuggestedWindow");
