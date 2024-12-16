@@ -153,7 +153,7 @@ export async function createAccount(nonce, privateKey, jsonWebKey, acmeDirectory
             else {
                 return {
                     answer: { error: await response.json() },
-                    nonce: null
+                    nonce: await getNonce(response.headers, acmeDirectory)
                 };
             }
         }
@@ -204,7 +204,7 @@ export async function createOrder(kid, nonce, privateKey, identifiers, acmeDirec
             else {
                 return {
                     answer: { error: await response.json() },
-                    nonce: null
+                    nonce: await getNonce(response.headers, acmeDirectory)
                 };
             }
         }
@@ -259,7 +259,7 @@ export async function finalizeOrder(commonName, kid, nonce, privateKey, publicKe
             else {
                 return {
                     answer: { error: await response.json() },
-                    nonce: response.headers.get(REPLAY_NONCE)
+                    nonce: await getNonce(response.headers, acmeDirectory)
                 };
             }
         }
@@ -306,11 +306,9 @@ export async function postAsGet(kid, nonce, privateKey, url, acmeDirectory) {
                 };
             }
             else {
-                const nextNonce = await newNonce(acmeDirectory.newNonce);
-
                 return {
                     answer: { error: await response.json() },
-                    nonce: nextNonce.nonce ? nextNonce.nonce : null
+                    nonce: await getNonce(response.headers, acmeDirectory)
                 };
             }
         }
@@ -357,11 +355,9 @@ export async function postAsGetChal(kid, nonce, privateKey, url, acmeDirectory) 
                 };
             }
             else {
-                const nextNonce = await newNonce(acmeDirectory.newNonce);
-
                 return {
                     answer: { error: await response.json() },
-                    nonce: nextNonce.nonce ? nextNonce.nonce : null
+                    nonce: await getNonce(response.headers, acmeDirectory)
                 };
             }
         }
@@ -652,6 +648,18 @@ export async function fetchAndRetryProtectedUntilOk(payload, protectedHeader, pr
     return undefined;
 }
 
+async function getNonce(headers, acmeDirectory) {
+    const replay = headers ? headers.get(REPLAY_NONCE) : undefined;
+
+    if (replay == undefined) {
+        const nextNonce = await newNonce(acmeDirectory.newNonce);
+
+        return nextNonce.nonce ? nextNonce.nonce : null;
+    }
+
+    return replay;
+}
+
 function notCompletedError(error, exception) {
     return {
         answer:
@@ -670,24 +678,3 @@ function errorTemplate(type, details, status) {
         }
     }
 }
-
-module.exports = {
-    newDirectory,
-    newNonce,
-    createJsonWebKey,
-    createAccount,
-    createOrder,
-    finalizeOrder,
-    postAsGet,
-    postAsGetChal,
-    signPayloadJson,
-    signPayload,
-    formatPublicKey,
-    formatPrivateKey,
-    base64urlEncode,
-    hexToBytes,
-    fetchRequest,
-    fetchSuggestedWindow,
-    fetchAndRetryUntilOk,
-    fetchAndRetryProtectedUntilOk
-};
