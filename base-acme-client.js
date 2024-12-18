@@ -529,6 +529,7 @@ export async function fetchAndRetryUntilOk(fetchInput, init, attempts = 6, silen
  * @param {Object} privateKey - The private key for signing the request
  * @param {Object} acmeDirectory - The ACME directory containing URLs for ACME operations
  * @param {number} [attempts=6] - Maximum number of fetch attempts (default: 6)
+ * @param {boolean} silent - true to suppress console output on failure attempt
  * 
  * @returns {Promise<Response|undefined>} The response or undefined if all attempts fail
  *
@@ -553,7 +554,7 @@ export async function fetchAndRetryUntilOk(fetchInput, init, attempts = 6, silen
  *   // Process successful response
  * }
  */
-export async function fetchAndRetryProtectedUntilOk(payload, protectedHeader, privateKey, acmeDirectory, attempts = 3) {
+export async function fetchAndRetryProtectedUntilOk(payload, protectedHeader, privateKey, acmeDirectory, attempts = 3, silent = false) {
     let a = 1;
 
     while (a <= attempts) {
@@ -588,7 +589,9 @@ export async function fetchAndRetryProtectedUntilOk(payload, protectedHeader, pr
 
             protectedHeader.nonce = undefined;
 
-            console.log(a - 1, "attempt failed, trying again", protectedHeader);
+            if (!silent) {
+                console.log(a - 1, "attempt failed, trying again", protectedHeader);
+            }
 
             await new Promise((resolve) => setTimeout(() => { resolve(); }, 2250 * a)); // Each failed attempt will delay itself slightly more
         } catch (exception) {

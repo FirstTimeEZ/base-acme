@@ -531,6 +531,7 @@ Fetch a protected resource with multiple retry attempts and progressive backoff.
  * @param {Object} privateKey - The private key for signing the request
  * @param {Object} acmeDirectory - The ACME directory containing URLs for ACME operations
  * @param {number} [attempts=6] - Maximum number of fetch attempts (default: 6)
+ * @param {boolean} silent - true to suppress console output on failure attempt
  * 
  * @returns {Promise<Response|undefined>} The response or undefined if all attempts fail
  *
@@ -555,7 +556,7 @@ Fetch a protected resource with multiple retry attempts and progressive backoff.
  *   // Process successful response
  * }
  */
-export async function fetchAndRetryProtectedUntilOk(payload, protectedHeader, privateKey, acmeDirectory, attempts = 3) { /*...*/ }
+export async function fetchAndRetryProtectedUntilOk(payload, protectedHeader, privateKey, acmeDirectory, attempts = 3, silent = false) { /*...*/ }
 ```
 
 </details>
