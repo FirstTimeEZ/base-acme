@@ -23,8 +23,9 @@ Fetches the directory information from an `ACME` server.
  * @param {string} mainDirectoryUrl - The URL of the ACME server's directory endpoint
  * 
  * @returns {Promise<Object>} An object containing the directory information or an error
- * @property {Object|null} directory - The parsed directory JSON or null
- * @property {Response} error - The error response if the request was unsuccessful
+ * @property {Object|null} get - The parsed directory JSON or null
+ * 
+ * @property {null|Object} error - The error response if the request was unsuccessful
  */
 export async function newDirectory(mainDirectoryUrl) { /*...*/ }
 ```
@@ -48,8 +49,9 @@ Retrieves a new nonce from the `ACME` server.
  * @param {string} [newNonceUrl] - ACME Directory URL to fetch a new nonce.
  * 
  * @returns {Promise<Object>} An object containing the nonce or error details
- * @property {string} nonce - A new replay nonce for subsequent requests
- * @property {Object} error - The error response if the request was unsuccessful
+ * @property {string|null} nonce - A new replay nonce for subsequent requests
+ * 
+ * @property {null|Object} error - The error response if the request was unsuccessful
  */
 export async function newNonce(newNonceUrl) { /*...*/ }
 ```
@@ -102,10 +104,11 @@ Creates a new account on the `ACME` server.
  * @param {Object} acmeDirectory - The ACME directory containing URLs for ACME operations
  * 
  * @returns {Promise<Object>} An object containing the account creation result
- * @property {Object|null} account - The created account details
- * @property {string} location - The location URL of the created account
- * @property {Object} error - Error details if account creation fails
- * @property {string} nonce - A new replay nonce for subsequent requests
+ * @property {Object|null} get - The created account details
+ * @property {string|null} location - The location URL of the created account
+ * @property {string|null} nonce - A new replay nonce for subsequent requests
+ * 
+ * @property {null|Object} error - Error details if account creation fails
  */
 export async function createAccount(nonce, newAccountUrl, privateKey, jsonWebKey) { /*...*/ }
 ```
@@ -133,10 +136,11 @@ Creates a new order for certificate issuance on the `ACME` server.
  * @param {Object} acmeDirectory - The ACME directory containing URLs for ACME operations
  * 
  * @returns {Promise<Object>} An object containing the order creation result
- * @property {Object|null} order - The created order details
- * @property {string} location - The location URL of the created order
- * @property {Object} error - Error details if order creation fails
- * @property {string} nonce - A new replay nonce for subsequent requests
+ * @property {Object|null} get - The created order details
+ * @property {string|null} location - The location URL of the created order
+ * @property {string|null} nonce - A new replay nonce for subsequent requests
+ * 
+ * @property {null|Object} error - Error details if order creation fails
  */
 export async function createOrder(kid, nonce, privateKey, newOrderUrl, identifiers) { /*...*/ }
 ```
@@ -169,9 +173,10 @@ Finalizes a certificate order by submitting a Certificate Signing Request (CSR).
  * 
  * @returns {Promise<Object>} An object containing the order finalization result
  * @property {Object|null} get - The finalized order details
- * @property {string} location - The location URL of the finalized order
- * @property {Object} error - Error details if finalization fails
- * @property {string} nonce - A new replay nonce for subsequent requests
+ * @property {string|null} location - The location URL of the finalized order
+ * @property {string|null} nonce - A new replay nonce for subsequent requests
+ * 
+ * @property {null|Object} error - Error details if finalization fails
  */
 export async function finalizeOrder(commonName, kid, nonce, privateKey, publicKeySign, privateKeySign, finalizeUrl, dnsNames) { /*...*/ }
 ```
@@ -200,10 +205,11 @@ Performs a POST-as-GET request to retrieve order or authorization status.
  * 
  * @returns {Promise<Object>} An object containing the retrieved information
  * @property {Object|null} get - The retrieved resource details
- * @property {string} location - The location URL of the resource
- * @property {Object} error - Error details if retrieval fails
- * @property {string} nonce - A new replay nonce for subsequent requests
- */
+ * @property {string|null} location - The location URL of the resource
+ * @property {string|null} nonce - A new replay nonce for subsequent requests
+ * 
+ * @property {null|Object} error - Error details if retrieval fails
+*/
 export async function postAsGet(kid, nonce, privateKey, url) { /*...*/ }
 ```
 
@@ -231,9 +237,10 @@ Performs a POST-as-GET request for challenges
  * 
  * @returns {Promise<Object>} An object containing the challenge details
  * @property {Object|null} get - The retrieved challenge details
- * @property {string} location - The location URL of the challenge
- * @property {Object} error - Error details if retrieval fails
- * @property {string} nonce - A new replay nonce for subsequent requests
+ * @property {string|null} location - The location URL of the challenge
+ * @property {string|null} nonce - A new replay nonce for subsequent requests
+ * 
+ * @property {null|Object} error - Error details if retrieval fails
  */
 export async function postAsGetChal(kid, nonce, privateKey, url) { /*...*/ }
 ```
@@ -453,7 +460,8 @@ Fetches the suggested renewal window information for a certificate from the spec
  * 
  * @returns {Promise<Object>} A promise that resolves to the parsed JSON of the suggested window
  * @property {Object|null} get - The retrieved suggested window
- * @property {Object} error - Error details if retrieval fails
+ * 
+ * @property {null|Object} error - Error details if retrieval fails
  * 
  * @throws {Error} Throws an error if the fetch operation fails.
  */
