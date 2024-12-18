@@ -241,7 +241,7 @@ export async function postAsGet(kid, nonce, privateKey, url, acmeDirectory) {
             url: url,
         };
 
-        const response = await fetchAndRetryProtectedUntilOk(METHOD_POST_AS_GET, protectedHeader, privateKey, acmeDirectory);
+        const response = await fetchAndRetryProtectedUntilOk(METHOD_POST_AS_GET, protectedHeader, privateKey, acmeDirectory, 3, true);
 
         if (response) {
             return returnAnswer(response, acmeDirectory);
@@ -279,7 +279,7 @@ export async function postAsGetChal(kid, nonce, privateKey, url, acmeDirectory) 
             url: url,
         };
 
-        const response = await fetchAndRetryProtectedUntilOk(METHOD_POST_AS_GET_CHALLENGE, protectedHeader, privateKey, acmeDirectory);
+        const response = await fetchAndRetryProtectedUntilOk(METHOD_POST_AS_GET_CHALLENGE, protectedHeader, privateKey, acmeDirectory, 3, true);
 
         if (response) {
             return returnAnswer(response, acmeDirectory);
