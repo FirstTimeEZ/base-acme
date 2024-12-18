@@ -32,15 +32,15 @@ const REPLAY_NONCE = 'replay-nonce';
  * @param {string} mainDirectoryUrl - The URL of the ACME server's directory endpoint
  * 
  * @returns {Promise<Object>} An object containing the directory information or an error
- * @property {Object|null} answer.directory - The parsed directory JSON or null
- * @property {Response} [answer.error] - The error response if the request was unsuccessful
+ * @property {Object|null} directory - The parsed directory JSON or null
+ * @property {Response} error - The error response if the request was unsuccessful
  */
 export async function newDirectory(mainDirectoryUrl) {
     try {
         const response = await fetchAndRetryUntilOk(mainDirectoryUrl, { method: METHOD_GET });
 
         if (response) {
-            return { answer: { [response.ok ? 'directory' : 'error']: await response.json() } };
+            return { [response.ok ? 'get' : 'error']: await response.json() };
         }
 
         return notCompletedError("newDirectory");
@@ -57,14 +57,14 @@ export async function newDirectory(mainDirectoryUrl) {
  * 
  * @returns {Promise<Object>} An object containing the nonce or error details
  * @property {string} nonce - A new replay nonce for subsequent requests
- * @property {Object} [answer.error] - The error response if the request was unsuccessful
+ * @property {Object} error - The error response if the request was unsuccessful
  */
 export async function newNonce(newNonceUrl) {
     try {
         const response = await fetchAndRetryUntilOk(newNonceUrl, { method: METHOD_HEAD });
 
         if (response) {
-            return response.ok ? { answer: null, nonce: response.headers.get(REPLAY_NONCE) } : { answer: { error: await response.json() } };
+            return response.ok ? { nonce: response.headers.get(REPLAY_NONCE) } : { error: await response.json() };
         }
 
         return notCompletedError("newNonce");
@@ -100,10 +100,9 @@ export async function createJsonWebKey(publicKey) {
  * @param {Object} acmeDirectory - The ACME directory containing URLs for ACME operations
  * 
  * @returns {Promise<Object>} An object containing the account creation result
- * @property {Object} answer - Contains account details or error information
- * @property {Object|null} [answer.account] - The created account details
- * @property {string} [answer.location] - The location URL of the created account
- * @property {Object} [answer.error] - Error details if account creation fails
+ * @property {Object|null} account - The created account details
+ * @property {string} location - The location URL of the created account
+ * @property {Object} error - Error details if account creation fails
  * @property {string} nonce - A new replay nonce for subsequent requests
  */
 export async function createAccount(nonce, privateKey, jsonWebKey, acmeDirectory) {
@@ -120,7 +119,7 @@ export async function createAccount(nonce, privateKey, jsonWebKey, acmeDirectory
         const response = await fetchAndRetryProtectedUntilOk(payload, protectedHeader, privateKey, acmeDirectory);
 
         if (response) {
-            return await returnAnswer(response, acmeDirectory, 'account');
+            return await returnAnswer(response, acmeDirectory);
         }
 
         return notCompletedError("createAccount");
@@ -140,10 +139,9 @@ export async function createAccount(nonce, privateKey, jsonWebKey, acmeDirectory
  * @param {Object} acmeDirectory - The ACME directory containing URLs for ACME operations
  * 
  * @returns {Promise<Object>} An object containing the order creation result
- * @property {Object} answer - Contains order details or error information
- * @property {Object|null} [answer.order] - The created order details
- * @property {string} [answer.location] - The location URL of the created order
- * @property {Object} [answer.error] - Error details if order creation fails
+ * @property {Object|null} order - The created order details
+ * @property {string} location - The location URL of the created order
+ * @property {Object} error - Error details if order creation fails
  * @property {string} nonce - A new replay nonce for subsequent requests
  */
 export async function createOrder(kid, nonce, privateKey, identifiers, acmeDirectory) {
@@ -160,7 +158,7 @@ export async function createOrder(kid, nonce, privateKey, identifiers, acmeDirec
         const response = await fetchAndRetryProtectedUntilOk(payload, protectedHeader, privateKey, acmeDirectory);
 
         if (response) {
-            return returnAnswer(response, acmeDirectory, 'order');
+            return returnAnswer(response, acmeDirectory);
         }
 
         return notCompletedError("createOrder");
@@ -184,10 +182,9 @@ export async function createOrder(kid, nonce, privateKey, identifiers, acmeDirec
  * @param {string[]} dnsNames - Additional DNS names to be included in the certificate
  * 
  * @returns {Promise<Object>} An object containing the order finalization result
- * @property {Object} answer - Contains finalization details or error information
- * @property {Object|null} [answer.get] - The finalized order details
- * @property {string} [answer.location] - The location URL of the finalized order
- * @property {Object} [answer.error] - Error details if finalization fails
+ * @property {Object|null} get - The finalized order details
+ * @property {string} location - The location URL of the finalized order
+ * @property {Object} error - Error details if finalization fails
  * @property {string} nonce - A new replay nonce for subsequent requests
  */
 export async function finalizeOrder(commonName, kid, nonce, privateKey, publicKeySign, privateKeySign, finalizeUrl, dnsNames, acmeDirectory) {
@@ -204,7 +201,7 @@ export async function finalizeOrder(commonName, kid, nonce, privateKey, publicKe
         const response = await fetchAndRetryProtectedUntilOk(payload, protectedHeader, privateKey, acmeDirectory);
 
         if (response) {
-            return returnAnswer(response, acmeDirectory, 'get');
+            return returnAnswer(response, acmeDirectory);
         }
 
         return notCompletedError("finalizeOrder");
@@ -224,10 +221,9 @@ export async function finalizeOrder(commonName, kid, nonce, privateKey, publicKe
  * @param {Object} acmeDirectory - The ACME directory containing URLs for ACME operations
  * 
  * @returns {Promise<Object>} An object containing the retrieved information
- * @property {Object} answer - Contains retrieved details or error information
- * @property {Object|null} [answer.get] - The retrieved resource details
- * @property {string} [answer.location] - The location URL of the resource
- * @property {Object} [answer.error] - Error details if retrieval fails
+ * @property {Object|null} get - The retrieved resource details
+ * @property {string} location - The location URL of the resource
+ * @property {Object} error - Error details if retrieval fails
  * @property {string} nonce - A new replay nonce for subsequent requests
  */
 export async function postAsGet(kid, nonce, privateKey, url, acmeDirectory) {
@@ -242,7 +238,7 @@ export async function postAsGet(kid, nonce, privateKey, url, acmeDirectory) {
         const response = await fetchAndRetryProtectedUntilOk(METHOD_POST_AS_GET, protectedHeader, privateKey, acmeDirectory);
 
         if (response) {
-            return returnAnswer(response, acmeDirectory, 'get');
+            return returnAnswer(response, acmeDirectory);
         }
 
         return notCompletedError("postAsGet");
@@ -262,10 +258,9 @@ export async function postAsGet(kid, nonce, privateKey, url, acmeDirectory) {
  * @param {Object} acmeDirectory - The ACME directory containing URLs for ACME operations
  * 
  * @returns {Promise<Object>} An object containing the challenge details
- * @property {Object} answer - Contains challenge details or error information
- * @property {Object|null} [answer.get] - The retrieved challenge details
- * @property {string} [answer.location] - The location URL of the challenge
- * @property {Object} [answer.error] - Error details if retrieval fails
+ * @property {Object|null} get - The retrieved challenge details
+ * @property {string} location - The location URL of the challenge
+ * @property {Object} error - Error details if retrieval fails
  * @property {string} nonce - A new replay nonce for subsequent requests
  */
 export async function postAsGetChal(kid, nonce, privateKey, url, acmeDirectory) {
@@ -280,7 +275,7 @@ export async function postAsGetChal(kid, nonce, privateKey, url, acmeDirectory) 
         const response = await fetchAndRetryProtectedUntilOk(METHOD_POST_AS_GET_CHALLENGE, protectedHeader, privateKey, acmeDirectory);
 
         if (response) {
-            return returnAnswer(response, acmeDirectory, 'get');
+            return returnAnswer(response, acmeDirectory);
         }
 
         return notCompletedError("postAsGetChal");
@@ -441,9 +436,8 @@ export async function fetchRequest(method, url, signedData) {
  * @param {string} serial - The serial number in hexadecimal format.
  * 
  * @returns {Promise<Object>} A promise that resolves to the parsed JSON of the suggested window
- * @property {Object} answer - Contains suggested window or error information
- * @property {Object|null} [answer.get] - The retrieved suggested window
- * @property {Object} [answer.error] - Error details if retrieval fails
+ * @property {Object|null} get - The retrieved suggested window
+ * @property {Object} error - Error details if retrieval fails
  * 
  * @throws {Error} Throws an error if the fetch operation fails.
  */
@@ -454,7 +448,7 @@ export async function fetchSuggestedWindow(renewalInfoUrl, aki, serial) {
         const response = await fetchAndRetryUntilOk(url, null, 2, true);
 
         if (response && response.ok) {
-            return { answer: { get: await response.json() } }
+            return { get: await response.json() }
         }
 
         return notCompletedError("fetchSuggestedWindow");
@@ -597,20 +591,18 @@ export async function fetchAndRetryProtectedUntilOk(payload, protectedHeader, pr
     return undefined;
 }
 
-async function returnAnswer(response, acmeDirectory, name) {
+async function returnAnswer(response, acmeDirectory) {
     return {
-        answer: { [response.ok ? name : 'error']: await response.json(), location: response.headers.get(NEXT_URL) },
+        [response.ok ? 'get' : 'error']: await response.json(),
+        location: response.headers.get(NEXT_URL),
         nonce: await getNextNonce(response.headers, acmeDirectory)
     };
 }
 
 function notCompletedError(error, exception) {
-    return {
-        answer:
-            !exception
-                ? errorTemplate(`bac:failed:${error}`, `Could not complete ${error} after multiple attempts`, 777777)
-                : errorTemplate(`bac:exception:${error}`, exception, 777779)
-    }
+    return !exception
+        ? errorTemplate(`bac:failed:${error}`, `Could not complete ${error} after multiple attempts`, 777777)
+        : errorTemplate(`bac:exception:${error}`, exception, 777779)
 }
 
 function errorTemplate(type, details, status) {

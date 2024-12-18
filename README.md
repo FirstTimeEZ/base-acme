@@ -23,8 +23,8 @@ Fetches the directory information from an `ACME` server.
  * @param {string} mainDirectoryUrl - The URL of the ACME server's directory endpoint
  * 
  * @returns {Promise<Object>} An object containing the directory information or an error
- * @property {Object|null} answer.directory - The parsed directory JSON or null
- * @property {Response} [answer.error] - The error response if the request was unsuccessful
+ * @property {Object|null} directory - The parsed directory JSON or null
+ * @property {Response} error - The error response if the request was unsuccessful
  */
 export async function newDirectory(mainDirectoryUrl) { /*...*/ }
 ```
@@ -49,7 +49,7 @@ Retrieves a new nonce from the `ACME` server.
  * 
  * @returns {Promise<Object>} An object containing the nonce or error details
  * @property {string} nonce - A new replay nonce for subsequent requests
- * @property {Object} [answer.error] - The error response if the request was unsuccessful
+ * @property {Object} error - The error response if the request was unsuccessful
  */
 export async function newNonce(newNonceUrl) { /*...*/ }
 ```
@@ -102,10 +102,9 @@ Creates a new account on the `ACME` server.
  * @param {Object} acmeDirectory - The ACME directory containing URLs for ACME operations
  * 
  * @returns {Promise<Object>} An object containing the account creation result
- * @property {Object} answer - Contains account details or error information
- * @property {Object|null} [answer.account] - The created account details
- * @property {string} [answer.location] - The location URL of the created account
- * @property {Object} [answer.error] - Error details if account creation fails
+ * @property {Object|null} account - The created account details
+ * @property {string} location - The location URL of the created account
+ * @property {Object} error - Error details if account creation fails
  * @property {string} nonce - A new replay nonce for subsequent requests
  */
 export async function createAccount(nonce, newAccountUrl, privateKey, jsonWebKey) { /*...*/ }
@@ -134,10 +133,9 @@ Creates a new order for certificate issuance on the `ACME` server.
  * @param {Object} acmeDirectory - The ACME directory containing URLs for ACME operations
  * 
  * @returns {Promise<Object>} An object containing the order creation result
- * @property {Object} answer - Contains order details or error information
- * @property {Object|null} [answer.order] - The created order details
- * @property {string} [answer.location] - The location URL of the created order
- * @property {Object} [answer.error] - Error details if order creation fails
+ * @property {Object|null} order - The created order details
+ * @property {string} location - The location URL of the created order
+ * @property {Object} error - Error details if order creation fails
  * @property {string} nonce - A new replay nonce for subsequent requests
  */
 export async function createOrder(kid, nonce, privateKey, newOrderUrl, identifiers) { /*...*/ }
@@ -170,10 +168,9 @@ Finalizes a certificate order by submitting a Certificate Signing Request (CSR).
  * @param {string[]} dnsNames - Additional DNS names to be included in the certificate
  * 
  * @returns {Promise<Object>} An object containing the order finalization result
- * @property {Object} answer - Contains finalization details or error information
- * @property {Object|null} [answer.get] - The finalized order details
- * @property {string} [answer.location] - The location URL of the finalized order
- * @property {Object} [answer.error] - Error details if finalization fails
+ * @property {Object|null} get - The finalized order details
+ * @property {string} location - The location URL of the finalized order
+ * @property {Object} error - Error details if finalization fails
  * @property {string} nonce - A new replay nonce for subsequent requests
  */
 export async function finalizeOrder(commonName, kid, nonce, privateKey, publicKeySign, privateKeySign, finalizeUrl, dnsNames) { /*...*/ }
@@ -202,10 +199,9 @@ Performs a POST-as-GET request to retrieve order or authorization status.
  * @param {Object} acmeDirectory - The ACME directory containing URLs for ACME operations
  * 
  * @returns {Promise<Object>} An object containing the retrieved information
- * @property {Object} answer - Contains retrieved details or error information
- * @property {Object|null} [answer.get] - The retrieved resource details
- * @property {string} [answer.location] - The location URL of the resource
- * @property {Object} [answer.error] - Error details if retrieval fails
+ * @property {Object|null} get - The retrieved resource details
+ * @property {string} location - The location URL of the resource
+ * @property {Object} error - Error details if retrieval fails
  * @property {string} nonce - A new replay nonce for subsequent requests
  */
 export async function postAsGet(kid, nonce, privateKey, url) { /*...*/ }
@@ -234,10 +230,9 @@ Performs a POST-as-GET request for challenges
  * @param {Object} acmeDirectory - The ACME directory containing URLs for ACME operations
  * 
  * @returns {Promise<Object>} An object containing the challenge details
- * @property {Object} answer - Contains challenge details or error information
- * @property {Object|null} [answer.get] - The retrieved challenge details
- * @property {string} [answer.location] - The location URL of the challenge
- * @property {Object} [answer.error] - Error details if retrieval fails
+ * @property {Object|null} get - The retrieved challenge details
+ * @property {string} location - The location URL of the challenge
+ * @property {Object} error - Error details if retrieval fails
  * @property {string} nonce - A new replay nonce for subsequent requests
  */
 export async function postAsGetChal(kid, nonce, privateKey, url) { /*...*/ }
@@ -457,9 +452,8 @@ Fetches the suggested renewal window information for a certificate from the spec
  * @param {string} serial - The serial number in hexadecimal format.
  * 
  * @returns {Promise<Object>} A promise that resolves to the parsed JSON of the suggested window
- * @property {Object} answer - Contains suggested window or error information
- * @property {Object} [answer.get] - The retrieved suggested window
- * @property {Object} [answer.error] - Error details if retrieval fails
+ * @property {Object|null} get - The retrieved suggested window
+ * @property {Object} error - Error details if retrieval fails
  * 
  * @throws {Error} Throws an error if the fetch operation fails.
  */
@@ -567,38 +561,32 @@ Errors and Exceptions will be returned in an object
 ```
 // Exceptions
 {
-  answer: {
-    error: {
-      type: 'bac:exception:methodName',
-      detail: Error: SyntaxError: Unexpected end of input
-          at file:///base-acme-client.js:666:11
-          at ModuleJob.run (node:internal/modules/esm/module_job:271:25)
-          at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:547:26)
-          at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:116:5),
-      status: 777777
-    }
+  error: {
+    type: 'bac:exception:methodName',
+    detail: Error: SyntaxError: Unexpected end of input
+        at file:///base-acme-client.js:666:11
+        at ModuleJob.run (node:internal/modules/esm/module_job:271:25)
+        at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:547:26)
+        at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:116:5),
+    status: 777777
   }
 }
 
 // Error from the Base ACME Client
 {
-  answer: {
-    error: {
-      type: 'bac:failed:methodName',
-      detail: 'Could not complete methodName after multiple attempts',
-      status: 777777
-    }
+  error: {
+    type: 'bac:failed:methodName',
+    detail: 'Could not complete methodName after multiple attempts',
+    status: 777777
   }
 }
 
 // Error from the ACME Server
 {
-  answer: {
-    error: {
-      type: 'urn:ietf:params:acme:error:orderNotReady',
-      detail: `Order's status ("valid") is not acceptable for finalization`,
-      status: 403
-    }
+  error: {
+    type: 'urn:ietf:params:acme:error:orderNotReady',
+    detail: `Order's status ("valid") is not acceptable for finalization`,
+    status: 403
   }
 }
 ```
